@@ -11,6 +11,7 @@ from typing import Iterator, Tuple, List, TYPE_CHECKING
 import tcod
 from game_map import GameMap
 import tile_types
+import entity_factories
 
 if TYPE_CHECKING:
     from entity import Entity
@@ -49,6 +50,20 @@ class RectangularRoom:
             and self.y2 >= other.y1
         )
     
+def place_entities(
+    room: RectangularRoom, dungeon: GameMap, maximum_monsters: int,
+ ) -> None:
+    number_of_monsters = random.randint(0, maximum_monsters)
+
+    for i in range(number_of_monsters):
+        x = random.randint(room.x1 + 1, room.x2 - 1)
+        y = random.randint(room.y1 + 1, room.y2 - 1)
+
+        if random.random() < 0.8:
+                entity_factories.orc.spawn(dungeon, x, y)
+        else:
+                entity_factories.troll.spawn(dungeon, x, y)
+    
 def tunnel_between(
     start: Tuple[int, int], end: Tuple[int, int]
 ) -> Iterator[Tuple[int, int]]:
@@ -77,7 +92,8 @@ def generate_dungeon(
     player: Entity,
 ) -> GameMap:
     """Generate a new dungeon map."""
-    dungeon = GameMap(map_width, map_height)
+    #dungeon = GameMap(map_width, map_height)
+    dungeon = GameMap(map_width, map_height, entities=[player])
 
     rooms: List[RectangularRoom] = []
 

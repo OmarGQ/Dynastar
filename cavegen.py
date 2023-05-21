@@ -19,11 +19,13 @@ if TYPE_CHECKING:
 
 def generate_terrain(
     map_width: int,
-    map_height: int
+    map_height: int,
+    player: Entity
 ):
     """Generate a new terrain map."""
     #"""
-    terrain = GameMap(map_width, map_height)
+    #terrain = GameMap(map_width, map_height)
+    terrain = GameMap(map_width, map_height, entities=[player])
     # Set noise
     noise = tcod.noise.Noise(
          dimensions=2,
@@ -64,7 +66,7 @@ def generate_terrain(
     # Return the sampled noise from this grid of points.
     samples = noise.sample_ogrid(ogrid)
 
-    cave = GameMap(map_width, map_height)
+    cave = GameMap(map_width, map_height, entities=[player]))
     for i in range(map_width):
         for j in range(map_height):
             if samples[i][j]<-0.4:
@@ -83,6 +85,7 @@ def generate_rooms(
     max_rooms: int,
     room_min_size: int,
     room_max_size: int,
+    max_monsters_per_room: int,
     map_width: int,
     map_height: int,
     player: Entity,
@@ -114,6 +117,9 @@ def generate_rooms(
         else:  # Make a tunnel between this room and the previous one.
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
+        #Place enemies
+        place_entities(new_room, dungeon, max_monsters_per_room)
+        
         rooms.append(new_room) # Append the new room to the list.
     for room in rooms:
         dungeon.tiles[room.inner] = tile_types.room_floor
