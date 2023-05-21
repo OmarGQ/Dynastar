@@ -9,7 +9,7 @@ import copy
 import entity_factories
 from engine import Engine
 from input_handlers import EventHandler
-from procgen import generate_dungeon
+#from procgen import generate_dungeon
 from cavegen import generate_terrain, generate_rooms
 from noise_test import *
 
@@ -46,7 +46,6 @@ def main() -> None:
         player=player
     )
     """
-    #"""
     game_map, noise = generate_terrain(
         map_width=map_width,
         map_height=map_height,

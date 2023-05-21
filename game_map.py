@@ -48,7 +48,7 @@ class GameMap:
             default=tile_types.SHROUD
         )
         
-        # Set enemies
+        # Set entities
         for entity in self.entities:
             # Only print entities that are in the FOV
             if self.visible[entity.x, entity.y]:

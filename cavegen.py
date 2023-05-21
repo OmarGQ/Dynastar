@@ -23,8 +23,6 @@ def generate_terrain(
     player: Entity
 ):
     """Generate a new terrain map."""
-    #"""
-    #terrain = GameMap(map_width, map_height)
     terrain = GameMap(map_width, map_height, entities=[player])
     # Set noise
     noise = tcod.noise.Noise(
@@ -106,19 +104,16 @@ def generate_rooms(
         # Run through the other rooms and see if they intersect with this one.
         if any(new_room.intersects(other_room) for other_room in rooms):
             continue  # This room intersects, so go to the next attempt.
-        # If there are no intersections then the room is valid.
 
         # Clear out the room's inner area.
         dungeon.tiles[new_room.area] = tile_types.wall
-        #dungeon.tiles[new_room.inner] = tile_types.floor
 
         if len(rooms) == 0: # The first room, where the player starts.
             player.x, player.y = new_room.center
         else:  # Make a tunnel between this room and the previous one.
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
-        #Place enemies
-        place_entities(new_room, dungeon, max_monsters_per_room)
+            place_entities(new_room, dungeon, max_monsters_per_room) #Place enemies
         
         rooms.append(new_room) # Append the new room to the list.
     for room in rooms:

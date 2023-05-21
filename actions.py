@@ -47,6 +47,8 @@ class MovementAction(ActionWithDirection):
             return  # Destination is blocked by a tile.
         if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
             return  # Destination is blocked by an entity.
+        if engine.game_map.tiles["goal"][dest_x, dest_y]:
+            print("you win")
         entity.move(self.dx, self.dy)
         
 class BumpAction(ActionWithDirection):

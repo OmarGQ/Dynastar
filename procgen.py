@@ -56,8 +56,8 @@ def place_entities(
     number_of_monsters = random.randint(0, maximum_monsters)
 
     for i in range(number_of_monsters):
-        x = random.randint(room.x1 + 1, room.x2 - 1)
-        y = random.randint(room.y1 + 1, room.y2 - 1)
+        x = random.randint(room.x1 + 1, room.x2 - 2)
+        y = random.randint(room.y1 + 1, room.y2 - 2)
 
         if random.random() < 0.8:
                 entity_factories.orc.spawn(dungeon, x, y)
@@ -82,7 +82,7 @@ def tunnel_between(
         yield x, y
     for x, y in tcod.los.bresenham((corner_x, corner_y), (x2, y2)).tolist():
         yield x, y
-        
+"""    
 def generate_dungeon(
     max_rooms: int,
     room_min_size: int,
@@ -91,7 +91,6 @@ def generate_dungeon(
     map_height: int,
     player: Entity,
 ) -> GameMap:
-    """Generate a new dungeon map."""
     #dungeon = GameMap(map_width, map_height)
     dungeon = GameMap(map_width, map_height, entities=[player])
 
@@ -123,3 +122,4 @@ def generate_dungeon(
         rooms.append(new_room) # Append the new room to the list.
 
     return dungeon
+"""
