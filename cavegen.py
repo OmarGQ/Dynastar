@@ -15,15 +15,16 @@ import tile_types
 from procgen import *
 
 if TYPE_CHECKING:
-    from entity import Entity
+    from engine import Engine
 
 def generate_terrain(
     map_width: int,
     map_height: int,
-    player: Entity
+    engine: Engine,
 ):
     """Generate a new terrain map."""
-    terrain = GameMap(map_width, map_height, entities=[player])
+    player = engine.player
+    terrain = GameMap(engine, map_width, map_height, entities=[player])
     # Set noise
     noise = tcod.noise.Noise(
          dimensions=2,
@@ -109,7 +110,7 @@ def generate_rooms(
         dungeon.tiles[new_room.area] = tile_types.wall
 
         if len(rooms) == 0: # The first room, where the player starts.
-            player.x, player.y = new_room.center
+            player.place(*new_room.center, dungeon)
         else:  # Make a tunnel between this room and the previous one.
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
