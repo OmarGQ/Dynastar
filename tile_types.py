@@ -81,7 +81,7 @@ room_floor = new_tile(
     light=(ord("█"), (100, 100, 0), (100, 100, 0)),
 )
 goal = new_tile(
-    walkable=True, 
+    walkable=False, 
     goal=True,
     transparent=True, 
     dark=(ord("▲"), (10, 155, 10), (50, 50, 0)),

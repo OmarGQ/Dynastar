@@ -7,6 +7,7 @@ Created on Tue Feb 21 15:28:51 2023
 
 from __future__ import annotations
 from typing import Optional, Tuple, TYPE_CHECKING
+import colors
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -70,12 +71,12 @@ class MovementAction(ActionWithDirection):
 
         if not self.engine.game_map.in_bounds(dest_x, dest_y):
             return  # Destination is out of bounds.
+        if self.engine.game_map.tiles["goal"][dest_x, dest_y]:
+            print("you win")
         if not self.engine.game_map.tiles["walkable"][dest_x, dest_y]:
             return  # Destination is blocked by a tile.
         if self.engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
             return  # Destination is blocked by an entity.
-        if self.engine.game_map.tiles["goal"][dest_x, dest_y]:
-            print("you win")
         self.entity.move(self.dx, self.dy)
         
 class BumpAction(ActionWithDirection):
@@ -93,10 +94,19 @@ class MeleeAction(ActionWithDirection):
             return  # No entity to attack.
 
         damage = self.entity.fighter.power - target.fighter.defense
-
         attack_desc = f"{self.entity.name.capitalize()} attacks {target.name}"
+        
+        if self.entity is self.engine.player:
+            attack_color = colors.player_atk
+        else:
+            attack_color = colors.enemy_atk
+            
         if damage > 0:
-            print(f"{attack_desc} for {damage} hit points.")
+            self.engine.message_log.add_message(
+                f"{attack_desc} for {damage} hit points.", attack_color
+            )
             target.fighter.hp -= damage
         else:
-            print(f"{attack_desc} but does no damage.")
+            self.engine.message_log.add_message(
+                f"{attack_desc} but does no damage.", attack_color
+            )

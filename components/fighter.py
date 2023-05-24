@@ -4,11 +4,13 @@ Created on Tue May 23 12:42:07 2023
 
 @author: kiddra
 """
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from components.base_component import BaseComponent
 from input_handlers import GameOverEventHandler
 from render_order import RenderOrder
+import colors
 
 if TYPE_CHECKING:
     from entity import Actor
@@ -34,9 +36,11 @@ class Fighter(BaseComponent):
     def die(self) -> None:
         if self.engine.player is self.entity:
             death_message = "You died!"
+            death_message_color = colors.player_die
             self.engine.event_handler = GameOverEventHandler(self.engine)
         else:
             death_message = f"{self.entity.name} is dead!"
+            death_message_color = colors.enemy_die
 
         self.entity.char = "%"
         self.entity.color = (191, 0, 0)
@@ -45,4 +49,4 @@ class Fighter(BaseComponent):
         self.entity.name = f"remains of {self.entity.name}"
         self.entity.render_order = RenderOrder.CORPSE
         
-        print(death_message)
+        self.engine.message_log.add_message(death_message, death_message_color)
