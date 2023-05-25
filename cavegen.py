@@ -8,11 +8,11 @@ Created on Mon Mar  6 14:31:36 2023
 from __future__ import annotations
 import numpy as np
 import random
-from typing import Iterator, Tuple, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 import tcod
 from game_map import GameMap
 import tile_types
-from procgen import *
+from procgen import RectangularRoom, tunnel_between, place_entities
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -85,13 +85,13 @@ def generate_rooms(
     room_min_size: int,
     room_max_size: int,
     max_monsters_per_room: int,
+    max_items_per_room: int,
     map_width: int,
     map_height: int,
-    player: Entity,
 ) -> GameMap:
     """Generate a new dungeon map."""
     rooms: List[RectangularRoom] = []
-
+    player = dungeon.engine.player
     for r in range(max_rooms):
         room_width = random.randint(room_min_size, room_max_size)
         room_height = random.randint(room_min_size, room_max_size)
@@ -114,7 +114,7 @@ def generate_rooms(
         else:  # Make a tunnel between this room and the previous one.
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
-            place_entities(new_room, dungeon, max_monsters_per_room) #Place enemies
+            place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room) #Place enemies
         
         rooms.append(new_room) # Append the new room to the list.
     for room in rooms:

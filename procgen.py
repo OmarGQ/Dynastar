@@ -7,14 +7,14 @@ Created on Tue Feb 21 16:41:16 2023
 
 from __future__ import annotations
 import random
-from typing import Iterator, Tuple, List, TYPE_CHECKING
+from typing import Iterator, Tuple, TYPE_CHECKING
 import tcod
 from game_map import GameMap
-import tile_types
+#import tile_types
 import entity_factories
 
-if TYPE_CHECKING:
-    from engine import Engine
+#if TYPE_CHECKING:
+#    from engine import Engine
 
 class RectangularRoom:
     def __init__(self, x: int, y: int, width: int, height: int):
@@ -51,10 +51,11 @@ class RectangularRoom:
         )
     
 def place_entities(
-    room: RectangularRoom, dungeon: GameMap, maximum_monsters: int,
+    room: RectangularRoom, dungeon: GameMap, maximum_monsters: int, maximum_items: int
  ) -> None:
     number_of_monsters = random.randint(0, maximum_monsters)
-
+    number_of_items = random.randint(0, maximum_items)
+    
     for i in range(number_of_monsters):
         x = random.randint(room.x1 + 1, room.x2 - 2)
         y = random.randint(room.y1 + 1, room.y2 - 2)
@@ -63,6 +64,13 @@ def place_entities(
                 entity_factories.orc.spawn(dungeon, x, y)
         else:
                 entity_factories.troll.spawn(dungeon, x, y)
+    
+    for i in range(number_of_items):
+        x = random.randint(room.x1 + 1, room.x2 - 1)
+        y = random.randint(room.y1 + 1, room.y2 - 1)
+
+        if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+            entity_factories.health_potion.spawn(dungeon, x, y)
     
 def tunnel_between(
     start: Tuple[int, int], end: Tuple[int, int]
@@ -90,6 +98,7 @@ def generate_dungeon(
     map_width: int,
     map_height: int,
     max_monsters_per_room: int,
+    max_items_per_room: int,
     engine: Engine,
 ) -> GameMap:
     #dungeon = GameMap(map_width, map_height)
