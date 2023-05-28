@@ -49,8 +49,8 @@ floor = new_tile(
     walkable=True, 
     goal=False,
     transparent=True, 
-    dark=(ord(" "), (155, 155, 155), (25, 25, 0)),
-    light=(ord(" "), (255, 255, 255), (50, 50, 0)),
+    dark=(ord(" "), (0, 0, 0), (25, 25, 0)),
+    light=(ord(" "), (0, 0, 0), (50, 50, 0)),
 )
 wall = new_tile(
     walkable=False, 
@@ -77,13 +77,13 @@ room_floor = new_tile(
     walkable=True, 
     goal=False,
     transparent=True, 
-    dark=(ord("█"), (50, 50, 0), (50, 50, 0)),
-    light=(ord("█"), (100, 100, 0), (100, 100, 0)),
+    dark=(ord(" "), (0, 0, 0), (60, 60, 60)),
+    light=(ord(" "), (0, 0, 0), (130, 130, 130)),
 )
 goal = new_tile(
     walkable=False, 
     goal=True,
     transparent=True, 
-    dark=(ord("▲"), (10, 155, 10), (50, 50, 0)),
-    light=(ord("▲"), (20, 255, 20), (100, 100, 0)),
+    dark=(ord("▲"), (10, 155, 10), (60, 60, 60)),
+    light=(ord("▲"), (20, 255, 20), (130, 130, 130)),
 )
