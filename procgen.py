@@ -7,14 +7,14 @@ Created on Tue Feb 21 16:41:16 2023
 
 from __future__ import annotations
 import random
-from typing import Iterator, Tuple, TYPE_CHECKING
+from typing import List, Iterator, Tuple, TYPE_CHECKING
 import tcod
 from game_map import GameMap
-#import tile_types
+import tile_types
 import entity_factories
 
-#if TYPE_CHECKING:
-#    from engine import Engine
+if TYPE_CHECKING:
+    from engine import Engine
 
 class RectangularRoom:
     def __init__(self, x: int, y: int, width: int, height: int):
@@ -98,7 +98,7 @@ def tunnel_between(
         yield x, y
     for x, y in tcod.los.bresenham((corner_x, corner_y), (x2, y2)).tolist():
         yield x, y
-"""    
+
 def generate_dungeon(
     max_rooms: int,
     room_min_size: int,
@@ -109,8 +109,9 @@ def generate_dungeon(
     max_items_per_room: int,
     engine: Engine,
 ) -> GameMap:
-    #dungeon = GameMap(map_width, map_height)
+    """Generate a new dungeon map."""
     player = engine.player
+    center_of_last_room = (0, 0)
     dungeon = GameMap(engine, map_width, map_height, entities=[player])
 
     rooms: List[RectangularRoom] = []
@@ -130,15 +131,22 @@ def generate_dungeon(
             continue  # This room intersects, so go to the next attempt.
         # If there are no intersections then the room is valid.
 
-        # Clear out the room's inner area.
+        # Dig out this rooms inner area.
         dungeon.tiles[new_room.inner] = tile_types.floor
 
-        if len(rooms) == 0: # The first room, where the player starts.
+        if len(rooms) == 0:
+            # The first room, where the player starts.
             player.place(*new_room.center, dungeon)
-        else:  # Make a tunnel between this room and the previous one.
+        else:  # All rooms after the first.
+            # Dig out a tunnel between this room and the previous one.
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
-        rooms.append(new_room) # Append the new room to the list.
+            center_of_last_room = new_room.center
+        place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room)
+        dungeon.tiles[center_of_last_room] = tile_types.down_stairs
+        dungeon.downstairs_location = center_of_last_room
+        
+        # Finally, append the new room to the list.
+        rooms.append(new_room)
 
     return dungeon
-"""
