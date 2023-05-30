@@ -84,10 +84,9 @@ def generate_rooms(
     max_rooms: int,
     room_min_size: int,
     room_max_size: int,
-    max_monsters_per_room: int,
-    max_items_per_room: int,
     map_width: int,
     map_height: int,
+    engine: Engine,
 ) -> GameMap:
     """Generate a new dungeon map."""
     rooms: List[RectangularRoom] = []
@@ -116,7 +115,7 @@ def generate_rooms(
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
                 center_of_last_room = new_room.center
-            place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room) #Place enemies
+            place_entities(new_room, dungeon, engine.game_world.current_floor) #Place enemies
         rooms.append(new_room) # Append the new room to the list.
     for room in rooms:
         dungeon.tiles[room.inner] = tile_types.room_floor
