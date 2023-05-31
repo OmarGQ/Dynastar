@@ -2,7 +2,7 @@
 """
 Created on Tue Feb 21 15:15:47 2023
 
-@author: Kiddra
+@author: kiddra
 """
 import tcod
 import colors
