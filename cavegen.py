@@ -8,22 +8,23 @@ Created on Mon Mar  6 14:31:36 2023
 from __future__ import annotations
 import numpy as np
 import random
-from typing import Iterator, Tuple, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 import tcod
 from game_map import GameMap
 import tile_types
-from procgen import *
+from procgen import RectangularRoom, tunnel_between, place_entities
 
 if TYPE_CHECKING:
-    from entity import Entity
+    from engine import Engine
 
 def generate_terrain(
     map_width: int,
-    map_height: int
+    map_height: int,
+    engine: Engine,
 ):
     """Generate a new terrain map."""
-    #"""
-    terrain = GameMap(map_width, map_height)
+    player = engine.player
+    terrain = GameMap(engine, map_width, map_height, entities=[player])
     # Set noise
     noise = tcod.noise.Noise(
          dimensions=2,
@@ -64,7 +65,7 @@ def generate_terrain(
     # Return the sampled noise from this grid of points.
     samples = noise.sample_ogrid(ogrid)
 
-    cave = GameMap(map_width, map_height)
+    cave = GameMap(map_width, map_height, entities=[player]))
     for i in range(map_width):
         for j in range(map_height):
             if samples[i][j]<-0.4:
@@ -85,11 +86,12 @@ def generate_rooms(
     room_max_size: int,
     map_width: int,
     map_height: int,
-    player: Entity,
+    engine: Engine,
 ) -> GameMap:
     """Generate a new dungeon map."""
     rooms: List[RectangularRoom] = []
-
+    center_of_last_room = (0, 0)
+    player = dungeon.engine.player
     for r in range(max_rooms):
         room_width = random.randint(room_min_size, room_max_size)
         room_height = random.randint(room_min_size, room_max_size)
@@ -103,20 +105,20 @@ def generate_rooms(
         # Run through the other rooms and see if they intersect with this one.
         if any(new_room.intersects(other_room) for other_room in rooms):
             continue  # This room intersects, so go to the next attempt.
-        # If there are no intersections then the room is valid.
 
         # Clear out the room's inner area.
         dungeon.tiles[new_room.area] = tile_types.wall
-        #dungeon.tiles[new_room.inner] = tile_types.floor
 
         if len(rooms) == 0: # The first room, where the player starts.
-            player.x, player.y = new_room.center
+            player.place(*new_room.center, dungeon)
         else:  # Make a tunnel between this room and the previous one.
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
+                center_of_last_room = new_room.center
+            place_entities(new_room, dungeon, engine.game_world.current_floor) #Place enemies
         rooms.append(new_room) # Append the new room to the list.
     for room in rooms:
         dungeon.tiles[room.inner] = tile_types.room_floor
-    x, y = rooms[-1].center
-    dungeon.tiles[x][y] = tile_types.goal
+    dungeon.tiles[center_of_last_room] = tile_types.down_stairs
+    dungeon.downstairs_location = center_of_last_room
     return dungeon
