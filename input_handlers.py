@@ -12,6 +12,7 @@ import colors
 import exceptions
 import tcod.event
 import actions
+import winsound
 
 from actions import (
     Action,
@@ -93,6 +94,7 @@ class BaseEventHandler(tcod.event.EventDispatch[ActionOrHandler]):
         raise NotImplementedError()
 
     def ev_quit(self, event: tcod.event.Quit) -> Optional[Action]:
+        winsound.PlaySound(None, 0)
         raise SystemExit()
 
 class PopupMessage(BaseEventHandler):
@@ -134,6 +136,7 @@ class EventHandler(BaseEventHandler):
             # A valid action was performed.
             if not self.engine.player.is_alive:
                 # The player was killed sometime during or after the action.
+                winsound.PlaySound("Music/No_Hope.wav", winsound.SND_ASYNC)
                 return GameOverEventHandler(self.engine)
             elif self.engine.player.level.requires_level_up:
                 return LevelUpEventHandler(self.engine)
@@ -508,6 +511,7 @@ class MainGameEventHandler(EventHandler):
         elif key == tcod.event.K_SLASH:
             return LookHandler(self.engine)
         elif key == tcod.event.K_ESCAPE:
+            winsound.PlaySound(None, 0)
             raise SystemExit()
         return action # No valid key was pressed
 
@@ -525,6 +529,7 @@ class SingleRangedAttackHandler(SelectIndexHandler):
 class GameOverEventHandler(EventHandler):
     def on_quit(self) -> None:
         """Handle exiting out of a finished game."""
+        winsound.PlaySound(None, 0)
         if os.path.exists("savegame.sav"):
             os.remove("savegame.sav")  # Deletes the active save file.
         raise exceptions.QuitWithoutSaving()  # Avoid saving a finished game.

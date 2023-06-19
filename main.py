@@ -10,7 +10,7 @@ import traceback
 import exceptions
 import input_handlers
 import setup_game
-
+    
 def save_game(handler: input_handlers.BaseEventHandler, filename: str) -> None:
     """If the current event handler has an active Engine then save it."""
     if isinstance(handler, input_handlers.EventHandler):
@@ -41,7 +41,9 @@ def main() -> None:
                 root_console.clear()
                 handler.on_render(console=root_console)
                 context.present(root_console)
-
+                #Full screen
+                #context.sdl_window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
+                
                 try:
                     for event in tcod.event.wait():
                         context.convert_event(event)

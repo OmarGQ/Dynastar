@@ -17,6 +17,7 @@ import traceback
 import colors
 import entity_factories
 import input_handlers
+import winsound
 from engine import Engine
 from game_map import GameWorld
 from cavegen import generate_terrain, generate_rooms
@@ -24,7 +25,6 @@ from cavegen import generate_terrain, generate_rooms
 
 # Load the background image and remove the alpha channel.
 background_image = tcod.image.load("images/menu_background.png")[:, :, :3]
-
 
 def new_game() -> Engine:
     """Return a brand new game session as an Engine instance."""
@@ -64,6 +64,9 @@ def new_game() -> Engine:
 
     player.inventory.items.append(leather_armor)
     player.equipment.toggle_equip(leather_armor, add_message=False)
+    
+    winsound.PlaySound("Music/Exploration.wav", winsound.SND_LOOP + winsound.SND_ASYNC)
+    
     return engine
 
 def load_game(filename: str) -> Engine:
@@ -71,11 +74,12 @@ def load_game(filename: str) -> Engine:
     with open(filename, "rb") as f:
         engine = pickle.loads(lzma.decompress(f.read()))
     assert isinstance(engine, Engine)
+    winsound.PlaySound("Music/Exploration.wav", winsound.SND_LOOP + winsound.SND_ASYNC)
     return engine
 
 class MainMenu(input_handlers.BaseEventHandler):
     """Handle the main menu rendering and input."""
-
+    winsound.PlaySound("Music/Menu.wav", winsound.SND_LOOP + winsound.SND_ASYNC)
     def on_render(self, console: tcod.Console) -> None:
         """Render the main menu on a background image."""
         console.draw_semigraphics(background_image, 0, 0)
@@ -113,6 +117,7 @@ class MainMenu(input_handlers.BaseEventHandler):
         self, event: tcod.event.KeyDown
     ) -> Optional[input_handlers.BaseEventHandler]:
         if event.sym in (tcod.event.K_q, tcod.event.K_ESCAPE):
+            winsound.PlaySound(None, 0)
             raise SystemExit()
         elif event.sym == tcod.event.K_c:
             try:
@@ -123,6 +128,7 @@ class MainMenu(input_handlers.BaseEventHandler):
                 traceback.print_exc()  # Print to stderr.
                 return input_handlers.PopupMessage(self, f"Failed to load save:\n{exc}")
         elif event.sym == tcod.event.K_n:
+            winsound.PlaySound(None, 0)
             return input_handlers.MainGameEventHandler(new_game())
 
         return None
