@@ -21,6 +21,7 @@ def generate_terrain(
     map_width: int,
     map_height: int,
     engine: Engine,
+    complexity: float
 ):
     """Generate a new terrain map."""
     player = engine.player
@@ -32,7 +33,7 @@ def generate_terrain(
     # Generate noise grid
     samples = noise[tcod.noise.grid(
         shape=(map_width, map_height), 
-        scale=0.25, 
+        scale = complexity,
         origin=(map_width/2, map_height/2))]
     # Scale grid.
     samples = ((samples + 1.0) * (256 / 2)).astype(np.uint8) 

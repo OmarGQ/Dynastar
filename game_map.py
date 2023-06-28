@@ -6,15 +6,24 @@ Created on Tue Feb 21 16:17:40 2023
 """
 
 from __future__ import annotations
-from typing import Iterable, Iterator, Optional, TYPE_CHECKING
+from typing import Iterable, Iterator, Optional, TYPE_CHECKING, List, Tuple
 import numpy as np
 from tcod.console import Console
 from entity import Actor, Item
 import tile_types
+import random
 
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Entity
+
+# room, min, max, rooms
+room_size_by_floor = [
+    (1, 8, 12, 7),
+    (2, 7, 11, 7),
+    (4, 6, 10, 8),
+    (7, 6, 8, 10),
+]
 
 class GameMap:
     def __init__(
@@ -102,22 +111,20 @@ class GameWorld:
         engine: Engine,
         map_width: int,
         map_height: int,
-        max_rooms: int,
-        room_min_size: int,
-        room_max_size: int,
-        current_floor: int = 0
+        current_floor: int = 0,
     ):
         self.engine = engine
 
         self.map_width = map_width
         self.map_height = map_height
 
-        self.max_rooms = max_rooms
+        self.max_rooms = 7
 
-        self.room_min_size = room_min_size
-        self.room_max_size = room_max_size
+        self.room_min_size = 0
+        self.room_max_size = 0
 
         self.current_floor = current_floor
+        self.complexity = 0.05
     """
     def generate_floor(self) -> None:
         from procgen import generate_dungeon
@@ -139,11 +146,16 @@ class GameWorld:
         from cavegen import generate_terrain, generate_rooms
 
         self.current_floor += 1
-
+        if self.complexity < 0.35:
+            self.complexity += 0.03
+        
+        self.room_min_size, self.room_max_size, self.max_rooms = get_size_values(room_size_by_floor, self.current_floor)
+        
         self.engine.game_map, noise = generate_terrain(
             map_width = self.map_width,
             map_height = self.map_height,
-            engine = self.engine
+            engine = self.engine,
+            complexity = self.complexity
         )
         self.engine.game_map = generate_rooms(
             dungeon = self.engine.game_map,
@@ -154,3 +166,21 @@ class GameWorld:
             map_height = self.map_height,
             engine = self.engine
         )
+
+def get_size_values(
+    weighted_chances_by_floor: List[Tuple[int, int, int, int]], floor: int
+ ) -> int:
+    current_min = 0
+    current_max = 0
+    current_rooms = 7
+
+    for floor_minimum, min_value, max_value, rooms in weighted_chances_by_floor:
+        print(floor_minimum)
+        if floor_minimum > floor:
+            break
+        else:
+            current_min = min_value
+            current_max = max_value
+            current_rooms = rooms
+
+    return current_min, current_max, current_rooms
