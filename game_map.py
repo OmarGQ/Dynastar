@@ -182,5 +182,4 @@ def get_size_values(
             current_min = min_value
             current_max = max_value
             current_rooms = rooms
-
     return current_min, current_max, current_rooms
