@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from engine import Engine
     from entity import Entity
 
-# room, min, max, rooms
+# level, min, max, rooms
 room_size_by_floor = [
     (1, 8, 12, 7),
     (2, 7, 11, 7),
@@ -124,7 +124,7 @@ class GameWorld:
         self.room_max_size = 0
 
         self.current_floor = current_floor
-        self.complexity = 0.05
+        self.complexity = 0.08
     """
     def generate_floor(self) -> None:
         from procgen import generate_dungeon
