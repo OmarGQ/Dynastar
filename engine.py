@@ -62,11 +62,15 @@ class Engine:
         render_functions.render_dungeon_level(
             console=console,
             dungeon_level=self.game_world.current_floor,
-            location=(0, 67),
+            location=(0, 63),
         )
 
         render_functions.render_names_at_mouse_location(
             console=console, x=21, y=61, engine=self
+        )
+        
+        render_functions.render_names_at_player_location(
+            console=console, x=0, y=65, engine=self
         )
         
     def save_as(self, filename: str) -> None:

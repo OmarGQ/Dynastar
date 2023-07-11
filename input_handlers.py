@@ -492,7 +492,10 @@ class MainGameEventHandler(EventHandler):
         player = self.engine.player
 
         if key == tcod.event.K_e:
-            return actions.TakeStairsAction(player)
+            if (player.x, player.y) == self.engine.game_map.downstairs_location:
+                return actions.TakeStairsAction(player)
+            else:
+                action = PickupAction(player)
         if key in MOVE_KEYS:
             dx, dy = MOVE_KEYS[key]
             action = BumpAction(player, dx, dy)
@@ -500,8 +503,6 @@ class MainGameEventHandler(EventHandler):
             action = WaitAction(player)
         elif key == tcod.event.K_v:
             return HistoryViewer(self.engine)
-        elif key == tcod.event.K_g:
-            action = PickupAction(player)
         elif key == tcod.event.K_i:
             return InventoryActivateHandler(self.engine)
         elif key == tcod.event.K_d:
@@ -540,6 +541,8 @@ class GameOverEventHandler(EventHandler):
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.K_ESCAPE:
             self.on_quit()
+        #elif event.sym == tcod.event.K_e:
+        #    self.BaseEventHandler = setup_game.MainMenu()
         elif event.sym == tcod.event.K_v:
             self.engine.event_handler = HistoryViewer(self.engine)
     
