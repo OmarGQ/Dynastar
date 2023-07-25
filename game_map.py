@@ -146,7 +146,7 @@ class GameWorld:
         from cavegen import generate_terrain, generate_rooms
 
         self.current_floor += 1
-        if self.complexity < 0.35:
+        if self.complexity < 0.32:
             self.complexity += 0.03
         
         self.room_min_size, self.room_max_size, self.max_rooms = get_size_values(room_size_by_floor, self.current_floor)

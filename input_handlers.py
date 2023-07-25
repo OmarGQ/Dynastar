@@ -514,6 +514,8 @@ class MainGameEventHandler(EventHandler):
         elif key == tcod.event.K_ESCAPE:
             winsound.PlaySound(None, 0)
             raise SystemExit()
+        elif key == tcod.event.K_BACKSPACE:
+            return actions.TakeStairsAction(player)
         return action # No valid key was pressed
 
 class SingleRangedAttackHandler(SelectIndexHandler):
@@ -545,6 +547,12 @@ class GameOverEventHandler(EventHandler):
         #    self.BaseEventHandler = setup_game.MainMenu()
         elif event.sym == tcod.event.K_v:
             self.engine.event_handler = HistoryViewer(self.engine)
+        """elif event.sym == tcod.event.K_p:
+            self.engine.game_world = GameWorld(
+                engine=self.engine,
+                map_width=90,
+                map_height=61
+            )"""
     
 class HistoryViewer(EventHandler):
     """Print the history on a larger window which can be navigated."""

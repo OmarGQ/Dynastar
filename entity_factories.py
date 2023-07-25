@@ -5,7 +5,7 @@ Created on Sat May 20 19:53:48 2023
 @author: kiddra
 """
 
-from components.ai import HostileEnemy
+from components.ai import HostileEnemy, SlowEnemy
 from components import consumable, equippable
 from components.fighter import Fighter
 from entity import Actor, Item
@@ -39,7 +39,7 @@ troll = Actor(
     char="T",
     color=(0, 127, 0),
     name="Troll",
-    ai_cls=HostileEnemy,
+    ai_cls=SlowEnemy,
     equipment=Equipment(),
     fighter=Fighter(hp=16, base_defense=1, base_power=4),
     inventory=Inventory(capacity=0),
