@@ -25,7 +25,7 @@ player = Actor(
 )
 
 orc = Actor(
-    char="o",
+    char="O",
     color=(63, 127, 63),
     name="Orc",
     ai_cls=HostileEnemy,
@@ -35,13 +35,46 @@ orc = Actor(
     level=Level(xp_given=35)
 )
  
+skeleton = Actor(
+    char="S",
+    color=(255, 255, 255),
+    name="Skeleton",
+    ai_cls=HostileEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=6, base_defense=1, base_power=2),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=25)
+)
+ 
+kobold = Actor(
+    char="K",
+    color=(164, 15, 15),
+    name="Kobold",
+    ai_cls=HostileEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=10, base_defense=2, base_power=3),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=60)
+)
+ 
+zombie = Actor(
+    char="Z",
+    color=(211, 244, 212),
+    name="Zombie",
+    ai_cls=SlowEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=5, base_defense=0, base_power=3),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=15)
+)
+
 troll = Actor(
     char="T",
     color=(0, 127, 0),
     name="Troll",
     ai_cls=SlowEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=16, base_defense=1, base_power=4),
+    fighter=Fighter(hp=16, base_defense=1, base_power=5),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=100)
 )
@@ -50,7 +83,14 @@ health_potion = Item(
     char="!",
     color=(127, 0, 255),
     name="Health Potion",
-    consumable=consumable.HealingConsumable(amount=4),
+    consumable=consumable.HealingConsumable(amount=5),
+)
+
+health_potion_Lv2 = Item(
+    char="!",
+    color=(127, 0, 255),
+    name="Health Potion",
+    consumable=consumable.HealingConsumable(amount=10),
 )
 
 lightning_scroll = Item(

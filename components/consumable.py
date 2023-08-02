@@ -149,3 +149,18 @@ class ConfusionConsumable(Consumable):
             entity=target, previous_ai=target.ai, turns_remaining=self.number_of_turns,
         )
         self.consume()
+        
+class DefenceConsumable(Consumable):
+    def __init__(self, amount: int):
+        self.amount = amount
+
+    def activate(self, action: actions.ItemAction) -> None:
+        consumer = action.entity
+        target = action.target_actor
+
+        self.engine.message_log.add_message(
+            f"The eyes of the {target.name} look vacant, as it starts to stumble around!",
+            colors.status_effect_applied,
+        )
+        consumer.fighter.base_defense += self.amount
+        self.consume()

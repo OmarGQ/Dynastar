@@ -18,26 +18,28 @@ if TYPE_CHECKING:
     from entity import Entity
 
 max_items_by_floor = [
-    (1, 1),
-    (4, 2),
-]
-
-max_monsters_by_floor = [
     (1, 2),
     (4, 3),
+]
+
+max_monsters_by_room = [
+    (1, 3),
+    (4, 4),
     (6, 5),
 ]
 
 item_chances: Dict[int, List[Tuple[Entity, int]]] = {
-    0: [(entity_factories.health_potion, 35)],
+    0: [(entity_factories.health_potion, 25)],
     2: [(entity_factories.confusion_scroll, 10)],
-    4: [(entity_factories.lightning_scroll, 25), (entity_factories.sword, 5)],
+    4: [(entity_factories.lightning_scroll, 25), (entity_factories.sword, 5), (entity_factories.health_potion, 25)],
     6: [(entity_factories.fireball_scroll, 25), (entity_factories.chain_mail, 15)],
 }
 
 enemy_chances: Dict[int, List[Tuple[Entity, int]]] = {
-    0: [(entity_factories.orc, 80)],
+    0: [(entity_factories.skeleton, 40), (entity_factories.zombie, 40), (entity_factories.orc, 20)],
+    1: [(entity_factories.orc, 60), (entity_factories.zombie, 20), (entity_factories.skeleton, 20)],
     3: [(entity_factories.troll, 15)],
+    4: [(entity_factories.kobold, 25)],
     5: [(entity_factories.troll, 30)],
     7: [(entity_factories.troll, 60)],
 }
@@ -112,7 +114,7 @@ class RectangularRoom:
     
 def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) -> None:
     number_of_monsters = random.randint(
-        0, get_max_value_for_floor(max_monsters_by_floor, floor_number)
+        0, get_max_value_for_floor(max_monsters_by_room, floor_number)
     )
     number_of_items = random.randint(
         0, get_max_value_for_floor(max_items_by_floor, floor_number)
@@ -185,8 +187,8 @@ def generate_dungeon(
             player.place(*new_room.center, dungeon)
         else:  # All rooms after the first.
             # Dig out a tunnel between this room and the previous one.
-            for x, y in tunnel_between(rooms[-1].center, new_room.center):
-                dungeon.tiles[x, y] = tile_types.floor
+            #for x, y in tunnel_between(rooms[-1].center, new_room.center):
+            #    dungeon.tiles[x, y] = tile_types.floor
             center_of_last_room = new_room.center
         place_entities(new_room, dungeon, engine.game_world.current_floorq)
         dungeon.tiles[center_of_last_room] = tile_types.down_stairs
@@ -194,5 +196,16 @@ def generate_dungeon(
         
         # Finally, append the new room to the list.
         rooms.append(new_room)
+        
+        #"""
+        roomN = 0
+        while True:
+            if rooms[roomN] == rooms[-1]:
+                break
+            x, y = tunnel_between(rooms[roomN].center, rooms[roomN+1].center)
+            dungeon.tiles[x, y] = tile_types.floor
+            roomN += 1
+        #"""
+        
 
     return dungeon
