@@ -59,18 +59,28 @@ class Engine:
             total_width=20,
         )
         
-        render_functions.render_dungeon_level(
-            console=console,
-            dungeon_level=self.game_world.current_floor,
-            location=(0, 63),
-        )
-
         render_functions.render_names_at_mouse_location(
             console=console, x=21, y=61, engine=self
         )
         
+        render_functions.render_dungeon_level(
+            console=console,
+            dungeon_level=self.game_world.current_floor,
+            location=(0, 62),
+        )
+        
+        render_functions.render_defense(
+            console=console, 
+            defense=self.player.fighter.defense, 
+            location=(0, 64))
+        
+        render_functions.render_power(
+            console=console, 
+            power=self.player.fighter.power, 
+            location=(0, 65))
+        
         render_functions.render_names_at_player_location(
-            console=console, x=0, y=65, engine=self
+            console=console, x=0, y=67, engine=self
         )
         
     def save_as(self, filename: str) -> None:

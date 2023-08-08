@@ -264,7 +264,7 @@ class LevelUpEventHandler(AskUserEventHandler):
         console.print(
             x=x + 1,
             y=4,
-            string=f"a) Constitution (+20 HP, from {self.engine.player.fighter.max_hp})",
+            string=f"a) Constitution (+10 HP, from {self.engine.player.fighter.max_hp})",
         )
         console.print(
             x=x + 1,

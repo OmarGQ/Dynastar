@@ -40,16 +40,26 @@ def render_bar(
 ) -> None:
     bar_width = int(float(current_value) / maximum_value * total_width)
 
-    console.draw_rect(x=0, y=62, width=total_width, height=1, ch=1, bg=colors.bar_empty)
+    console.draw_rect(x=0, y=63, width=total_width, height=1, ch=1, bg=colors.bar_empty)
 
     if bar_width > 0:
         console.draw_rect(
-            x=0, y=62, width=bar_width, height=1, ch=1, bg=colors.bar_filled
+            x=0, y=63, width=bar_width, height=1, ch=1, bg=colors.bar_filled
         )
 
     console.print(
-        x=1, y=62, string=f"HP: {current_value}/{maximum_value}", fg=colors.bar_text
+        x=1, y=63, string=f"HP: {current_value}/{maximum_value}", fg=colors.bar_text
     )
+    
+def render_defense(console, defense: int, location: Tuple[int, int])-> None:
+    """Render the player's defence."""
+    x, y = location
+    console.print(x=x, y=y, string=f"Defence: {defense}")
+
+def render_power(console, power: int, location: Tuple[int, int])-> None:
+    """Render the player's defence."""
+    x, y = location
+    console.print(x=x, y=y, string=f"Power: {power}")
     
 def render_dungeon_level(
     console: Console, dungeon_level: int, location: Tuple[int, int]

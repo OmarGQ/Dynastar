@@ -41,7 +41,7 @@ skeleton = Actor(
     name="Skeleton",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=6, base_defense=1, base_power=2),
+    fighter=Fighter(hp=7, base_defense=1, base_power=2),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=25)
 )
@@ -52,7 +52,7 @@ kobold = Actor(
     name="Kobold",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=10, base_defense=2, base_power=3),
+    fighter=Fighter(hp=15, base_defense=2, base_power=4),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=60)
 )
@@ -74,7 +74,7 @@ troll = Actor(
     name="Troll",
     ai_cls=SlowEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=16, base_defense=1, base_power=5),
+    fighter=Fighter(hp=16, base_defense=2, base_power=7),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=100)
 )
@@ -114,12 +114,17 @@ fireball_scroll = Item(
     consumable=consumable.FireballDamageConsumable(damage=12, radius=3),
 )
 
-dagger = Item(    char="/", color=(0, 191, 255), name="Dagger", equippable=equippable.Dagger())
+dagger = Item(char="/", color=(0, 191, 255), name="Dagger", equippable=equippable.Dagger())
 
 sword = Item(char="/", color=(0, 191, 255), name="Sword", equippable=equippable.Sword())
 
-leather_armor = Item(
-    char="[",
+axe = Item(char="/", color=(0, 191, 255), name="Axe", equippable=equippable.Axe())
+
+mace = Item(char="/", color=(0, 191, 255), name="Mace", equippable=equippable.Mace())
+
+long_sword = Item(char="/", color=(0, 191, 255), name="Long Sword", equippable=equippable.LongSword())
+
+leather_armor = Item(char="[",
     color=(139, 69, 19),
     name="Leather Armor",
     equippable=equippable.LeatherArmor(),
@@ -127,4 +132,16 @@ leather_armor = Item(
 
 chain_mail = Item(
     char="[", color=(139, 69, 19), name="Chain Mail", equippable=equippable.ChainMail()
+)
+
+breast_plate = Item(
+    char="[", color=(209, 205, 194), name="Breast Plate", equippable=equippable.BreastPlate()
+)
+
+plate_armor = Item(
+    char="[", color=(148, 143, 129), name="Plate Armor", equippable=equippable.PlateArmor()
+)
+
+scale_armor = Item(
+    char="[", color=(158, 5, 5), name="Scale Armor", equippable=equippable.ScaleArmor()
 )
