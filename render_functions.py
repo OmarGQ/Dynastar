@@ -40,15 +40,15 @@ def render_bar(
 ) -> None:
     bar_width = int(float(current_value) / maximum_value * total_width)
 
-    console.draw_rect(x=91, y=3, width=total_width, height=1, ch=1, bg=colors.bar_empty)
+    console.draw_rect(x=92, y=4, width=total_width, height=1, ch=1, bg=colors.bar_empty)
 
     if bar_width > 0:
         console.draw_rect(
-            x=91, y=3, width=bar_width, height=1, ch=1, bg=colors.bar_filled
+            x=92, y=4, width=bar_width, height=1, ch=1, bg=colors.bar_filled
         )
 
     console.print(
-        x=92, y=3, string=f"HP: {current_value}/{maximum_value}", fg=colors.bar_text
+        x=93, y=4, string=f"HP: {current_value}/{maximum_value}", fg=colors.bar_text
     )
 
 def render_names_at_mouse_location(
@@ -70,35 +70,49 @@ def render_names_at_player_location(
         x=engine.player.x, y=engine.player.y, game_map=engine.game_map
     )
     if names_at_location != "":
-        names_at_location = "Press E to interact\n" + names_at_location
+        names_at_location = "Press E to interact\nwhit:\n" + names_at_location
     console.print(x=x, y=y, string=names_at_location)
     
 def render_ui(console, player, world) -> None:
     "Render player's stats"
+    for i in range(1, 60):
+        console.print(x=90, y=i, string="|")
+        console.print(x=114, y=i, string="|")
+        
     console.print(x=90, y=1, string="o-Player----------------o")
-    console.print(x=91, y=2, string=f"Dungeon level: {world.current_floor}")
+    console.print(x=92, y=3, string=f"Dungeon level: {world.current_floor}")
     render_bar(
         console=console,
         current_value=player.fighter.hp,
         maximum_value=player.fighter.max_hp,
         total_width=20,
     )
-    console.print(x=91, y=4, string=f"Power: {player.fighter.defense}")
-    console.print(x=91, y=5, string=f"Power: {player.fighter.power}")
+    console.print(x=92, y=5, string=f"Level: {player.level.current_level}")
+    console.print(x=92, y=6, 
+                  string=f"XP: {player.level.current_xp}/{player.level.experience_to_next_level}")
+    console.print(x=92, y=7, string=f"Defense: {player.fighter.defense}")
+    console.print(x=92, y=8, string=f"Power: {player.fighter.power}")
     console.print(x=90, y=14, string="o-Inventory-------------o")
     
     number_of_items_in_inventory = len(player.inventory.items)
-    y=15
+    y=16
     if number_of_items_in_inventory > 0:
         for i, item in enumerate(player.inventory.items):
             item_key = chr(ord("1") + i)
             is_equipped = player.equipment.item_is_equipped(item)
-            item_string = f"({item_key}) {item.name}"
+            item_string = f"{item_key}) {item.name}"
 
             if is_equipped:
                 item_string = f"{item_string} (E)"
-            console.print(x=91, y=y + i, string=item_string)
+            console.print(x=92, y=y + i, string=item_string)
     else:
-        console.print(x=91, y=y, string="(Empty)")
-    console.print(x=90, y=69, string="o--------------------------o")
+        console.print(x=92, y=y, string="(Empty)")
+    console.print(x=90, y=26, string="o-Information-----------o")
+    console.print(x=92, y=28, string="'I' use item")
+    console.print(x=92, y=29, string="'D' Drop item'")
+    console.print(x=92, y=30, string="'V' See full log")
+    console.print(x=92, y=32, string="'esc' Exit the game")
+    console.print(x=92, y=33, string="'5' Wait")
+    console.print(x=92, y=34, string="' ' Move")
+    console.print(x=90, y=60, string="o-----------------------o")
     

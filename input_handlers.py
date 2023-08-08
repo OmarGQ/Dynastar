@@ -194,49 +194,6 @@ class AskUserEventHandler(EventHandler):
         """
         return MainGameEventHandler(self.engine)
 
-class CharacterScreenEventHandler(AskUserEventHandler):
-    TITLE = "Character Information"
-
-    def on_render(self, console: tcod.Console) -> None:
-        super().on_render(console)
-
-        if self.engine.player.x <= 30:
-            x = 40
-        else:
-            x = 0
-        y = 0
-
-        width = len(self.TITLE) + 4
-
-        console.draw_frame(
-            x=x,
-            y=y,
-            width=width,
-            height=7,
-            title=self.TITLE,
-            clear=True,
-            fg=(255, 255, 255),
-            bg=(0, 0, 0),
-        )
-
-        console.print(
-            x=x + 1, y=y + 1, string=f"Level: {self.engine.player.level.current_level}"
-        )
-        console.print(
-            x=x + 1, y=y + 2, string=f"XP: {self.engine.player.level.current_xp}"
-        )
-        console.print(
-            x=x + 1,
-            y=y + 3,
-            string=f"XP for next Level: {self.engine.player.level.experience_to_next_level}",
-        )
-        console.print(
-            x=x + 1, y=y + 4, string=f"Attack: {self.engine.player.fighter.power}"
-        )
-        console.print(
-            x=x + 1, y=y + 5, string=f"Defense: {self.engine.player.fighter.defense}"
-        )
-
 class LevelUpEventHandler(AskUserEventHandler):
     TITLE = "Level Up"
     def on_render(self, console: tcod.Console) -> None:
@@ -309,48 +266,25 @@ class InventoryEventHandler(AskUserEventHandler):
     TITLE = "<missing title>"
 
     def on_render(self, console: tcod.Console) -> None:
-        """Render an inventory menu, which displays the items in the inventory, and the letter to select them.
-        Will move to a different position based on where the player is located, so the player can always see where
-        they are.
-        """
+        """Render a wondow to indicate the player to select a item"""
         super().on_render(console)
         number_of_items_in_inventory = len(self.engine.player.inventory.items)
 
-        height = number_of_items_in_inventory + 2
-
-        if height <= 3:
-            height = 3
-
-        if self.engine.player.x <= 30:
-            x = 40
-        else:
-            x = 0
-
-        y = 0
-
-        width = len(self.TITLE) + 4
-
         console.draw_frame(
-            x=x,
-            y=y,
-            width=width,
-            height=height,
+            x=30,
+            y=30,
+            width=len(self.TITLE) + 4,
+            height=3,
             title=self.TITLE,
             clear=True,
             fg=(255, 255, 255),
             bg=(0, 0, 0),
         )
         if number_of_items_in_inventory > 0:
-            for i, item in enumerate(self.engine.player.inventory.items):
-                item_key = chr(ord("1") + i)
-                is_equipped = self.engine.player.equipment.item_is_equipped(item)
-                item_string = f"({item_key}) {item.name}"
-
-                if is_equipped:
-                    item_string = f"{item_string} (E)"
-                console.print(x + 1, y + i + 1, item_string)
+            console.print(31, 31, "Press the item number")
         else:
-            console.print(x + 1, y + 1, "(Empty)")
+            console.print(31, 31, "There is nothing here")
+
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         player = self.engine.player
@@ -507,8 +441,6 @@ class MainGameEventHandler(EventHandler):
             return InventoryActivateHandler(self.engine)
         elif key == tcod.event.K_d:
             return InventoryDropHandler(self.engine)
-        elif key == tcod.event.K_c:
-            return CharacterScreenEventHandler(self.engine)
         elif key == tcod.event.K_SLASH:
             return LookHandler(self.engine)
         elif key == tcod.event.K_ESCAPE:
