@@ -23,7 +23,7 @@ impossible = (0x80, 0x80, 0x80)
 error = (0xFF, 0x40, 0x40)
 
 
-welcome_text = (0x20, 0xA0, 0xFF)
+welcome_text = (0xFF, 0xFF, 0x00)
 health_recovered = (0x0, 0xFF, 0x0)
 
 bar_text = white
@@ -32,3 +32,7 @@ bar_empty = (0x40, 0x10, 0x10)
 
 menu_title = (255, 255, 63)
 menu_text = white
+
+UI_border = (102, 178, 255)
+UI_selection = (255, 255, 102)
+UI_xp = (255, 255, 0)

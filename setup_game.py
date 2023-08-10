@@ -101,7 +101,7 @@ class MainMenu(input_handlers.BaseEventHandler):
                 console.height // 2 - 2 + i,
                 text.ljust(menu_width),
                 fg=colors.menu_text,
-                bg=colors.black,
+                #bg=colors.black,
                 alignment=tcod.CENTER,
                 bg_blend=tcod.BKGND_ALPHA(64),
             )

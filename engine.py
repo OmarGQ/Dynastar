@@ -50,7 +50,7 @@ class Engine:
         # Render map
         self.game_map.render(console)
         # Render interface
-        self.message_log.render(console=console, x=21, y=62, width=60, height=8)
+        self.message_log.render(console=console, x=1, y=62, width=70, height=7)
         
         render_functions.render_ui(
             console=console,
@@ -59,11 +59,11 @@ class Engine:
             )
         
         render_functions.render_names_at_mouse_location(
-            console=console, x=91, y=28, engine=self
+            console=console, x=92, y=38, engine=self
         )
         
         render_functions.render_names_at_player_location(
-            console=console, x=91, y=29, engine=self
+            console=console, x=92, y=41, engine=self
         )
         
     def save_as(self, filename: str) -> None:
