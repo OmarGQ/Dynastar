@@ -21,6 +21,7 @@ import winsound
 from engine import Engine
 from game_map import GameWorld
 from cavegen import generate_terrain, generate_rooms
+from tcod import libtcodpy
 
 
 # Load the background image and remove the alpha channel.
@@ -82,14 +83,14 @@ class MainMenu(input_handlers.BaseEventHandler):
             console.height // 2 - 4,
             "DYNASTAR",
             fg=colors.menu_title,
-            alignment=tcod.CENTER,
+            alignment=libtcodpy.CENTER,
         )
         console.print(
             console.width // 2,
             console.height - 2,
             "By Kiddra",
             fg=colors.menu_title,
-            alignment=tcod.CENTER,
+            alignment=libtcodpy.CENTER,
         )
 
         menu_width = 24
@@ -102,17 +103,17 @@ class MainMenu(input_handlers.BaseEventHandler):
                 text.ljust(menu_width),
                 fg=colors.menu_text,
                 #bg=colors.black,
-                alignment=tcod.CENTER,
-                bg_blend=tcod.BKGND_ALPHA(64),
+                alignment=libtcodpy.CENTER,
+                bg_blend=libtcodpy.BKGND_ALPHA(64),
             )
 
     def ev_keydown(
         self, event: tcod.event.KeyDown
     ) -> Optional[input_handlers.BaseEventHandler]:
-        if event.sym in (tcod.event.K_q, tcod.event.K_ESCAPE):
+        if event.sym in (tcod.event.KeySym.q, tcod.event.KeySym.ESCAPE):
             winsound.PlaySound(None, 0)
             raise SystemExit()
-        elif event.sym == tcod.event.K_c:
+        elif event.sym == tcod.event.KeySym.c:
             try:
                 return input_handlers.MainGameEventHandler(load_game("savegame.sav"))
             except FileNotFoundError:
@@ -120,7 +121,7 @@ class MainMenu(input_handlers.BaseEventHandler):
             except Exception as exc:
                 traceback.print_exc()  # Print to stderr.
                 return input_handlers.PopupMessage(self, f"Failed to load save:\n{exc}")
-        elif event.sym == tcod.event.K_n:
+        elif event.sym == tcod.event.KeySym.n:
             winsound.PlaySound(None, 0)
             return input_handlers.MainGameEventHandler(new_game())
 

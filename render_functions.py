@@ -59,7 +59,6 @@ def render_names_at_mouse_location(
     names_at_mouse_location = get_names_at_location(
         x=mouse_x, y=mouse_y, game_map=engine.game_map
     )
-    print(names_at_mouse_location)
     console.print(x=x, y=y, string="Mouse is selecting:")
     console.print(x=x+2, y=y+1, string=names_at_mouse_location, fg=colors.UI_selection)
 

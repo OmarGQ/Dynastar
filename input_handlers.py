@@ -7,7 +7,9 @@ Created on Tue Feb 21 15:34:05 2023
 
 from __future__ import annotations
 from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
+from tcod import libtcodpy
 import os
+import sys
 import colors
 import exceptions
 import tcod.event
@@ -27,50 +29,41 @@ if TYPE_CHECKING:
    
 MOVE_KEYS = {
     # Arrow keys.
-    tcod.event.K_UP: (0, -1),
-    tcod.event.K_DOWN: (0, 1),
-    tcod.event.K_LEFT: (-1, 0),
-    tcod.event.K_RIGHT: (1, 0),
-    tcod.event.K_HOME: (-1, -1),
-    tcod.event.K_END: (-1, 1),
-    tcod.event.K_PAGEUP: (1, -1),
-    tcod.event.K_PAGEDOWN: (1, 1),
+    tcod.event.KeySym.UP: (0, -1),
+    tcod.event.KeySym.DOWN: (0, 1),
+    tcod.event.KeySym.LEFT: (-1, 0),
+    tcod.event.KeySym.RIGHT: (1, 0),
+    tcod.event.KeySym.HOME: (-1, -1),
+    tcod.event.KeySym.END: (-1, 1),
+    tcod.event.KeySym.PAGEUP: (1, -1),
+    tcod.event.KeySym.PAGEDOWN: (1, 1),
     # Numpad keys.
-    tcod.event.K_KP_1: (-1, 1),
-    tcod.event.K_KP_2: (0, 1),
-    tcod.event.K_KP_3: (1, 1),
-    tcod.event.K_KP_4: (-1, 0),
-    tcod.event.K_KP_6: (1, 0),
-    tcod.event.K_KP_7: (-1, -1),
-    tcod.event.K_KP_8: (0, -1),
-    tcod.event.K_KP_9: (1, -1),
-    # Vi keys.
-    tcod.event.K_h: (-1, 0),
-    tcod.event.K_j: (0, 1),
-    tcod.event.K_k: (0, -1),
-    tcod.event.K_l: (1, 0),
-    tcod.event.K_y: (-1, -1),
-    tcod.event.K_u: (1, -1),
-    tcod.event.K_b: (-1, 1),
-    tcod.event.K_n: (1, 1),
+    tcod.event.KeySym.KP_1: (-1, 1),
+    tcod.event.KeySym.KP_2: (0, 1),
+    tcod.event.KeySym.KP_3: (1, 1),
+    tcod.event.KeySym.KP_4: (-1, 0),
+    tcod.event.KeySym.KP_6: (1, 0),
+    tcod.event.KeySym.KP_7: (-1, -1),
+    tcod.event.KeySym.KP_8: (0, -1),
+    tcod.event.KeySym.KP_9: (1, -1),
 }
 
 WAIT_KEYS = {
-    tcod.event.K_PERIOD,
-    tcod.event.K_KP_5,
-    tcod.event.K_CLEAR,
+    tcod.event.KeySym.PERIOD,
+    tcod.event.KeySym.KP_5,
+    tcod.event.KeySym.CLEAR,
 }
 
 CURSOR_Y_KEYS = {
-    tcod.event.K_UP: -1,
-    tcod.event.K_DOWN: 1,
-    tcod.event.K_PAGEUP: -10,
-    tcod.event.K_PAGEDOWN: 10,
+    tcod.event.KeySym.UP: -1,
+    tcod.event.KeySym.DOWN: 1,
+    tcod.event.KeySym.PAGEUP: -10,
+    tcod.event.KeySym.PAGEDOWN: 10,
 }
 
 CONFIRM_KEYS = {
-    tcod.event.K_RETURN,
-    tcod.event.K_KP_ENTER,
+    tcod.event.KeySym.RETURN,
+    tcod.event.KeySym.KP_ENTER,
 }
 
 ActionOrHandler = Union[Action, "BaseEventHandler"]
@@ -107,8 +100,8 @@ class PopupMessage(BaseEventHandler):
     def on_render(self, console: tcod.Console) -> None:
         """Render the parent and dim the result, then print the message on top."""
         self.parent.on_render(console)
-        console.tiles_rgb["fg"] //= 8
-        console.tiles_rgb["bg"] //= 8
+        console.rgb["fg"] //= 8
+        console.rgb["bg"] //= 8
 
         console.print(
             console.width // 2,
@@ -116,7 +109,7 @@ class PopupMessage(BaseEventHandler):
             self.text,
             fg=colors.white,
             bg=colors.black,
-            alignment=tcod.CENTER,
+            alignment=libtcodpy.CENTER,
         )
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[BaseEventHandler]:
@@ -174,12 +167,12 @@ class AskUserEventHandler(EventHandler):
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         """By default any key exits this input handler."""
         if event.sym in {  # Ignore modifier keys.
-            tcod.event.K_LSHIFT,
-            tcod.event.K_RSHIFT,
-            tcod.event.K_LCTRL,
-            tcod.event.K_RCTRL,
-            tcod.event.K_LALT,
-            tcod.event.K_RALT,
+            tcod.event.KeySym.LSHIFT,
+            tcod.event.KeySym.RSHIFT,
+            tcod.event.KeySym.LCTRL,
+            tcod.event.KeySym.RCTRL,
+            tcod.event.KeySym.LALT,
+            tcod.event.KeySym.RALT,
         }:
             return None
         return self.on_exit()
@@ -418,14 +411,13 @@ class AreaRangedAttackHandler(SelectIndexHandler):
         return self.callback((x, y))
 
 class MainGameEventHandler(EventHandler):
-
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         action: Optional[Action] = None
 
         key = event.sym
         player = self.engine.player
 
-        if key == tcod.event.K_e:
+        if key == tcod.event.KeySym.e:
             if (player.x, player.y) == self.engine.game_map.downstairs_location:
                 return actions.TakeStairsAction(player)
             else:
@@ -435,18 +427,18 @@ class MainGameEventHandler(EventHandler):
             action = BumpAction(player, dx, dy)
         elif key in WAIT_KEYS:
             action = WaitAction(player)
-        elif key == tcod.event.K_v:
+        elif key == tcod.event.KeySym.v:
             return HistoryViewer(self.engine)
-        elif key == tcod.event.K_i:
+        elif key == tcod.event.KeySym.i:
             return InventoryActivateHandler(self.engine)
-        elif key == tcod.event.K_d:
+        elif key == tcod.event.KeySym.d:
             return InventoryDropHandler(self.engine)
-        elif key == tcod.event.K_SLASH:
+        elif key == tcod.event.KeySym.SLASH: ######################################
             return LookHandler(self.engine)
-        elif key == tcod.event.K_ESCAPE:
+        elif key == tcod.event.KeySym.ESCAPE:
             winsound.PlaySound(None, 0)
             raise SystemExit()
-        elif key == tcod.event.K_BACKSPACE:
+        elif key == tcod.event.KeySym.BACKSPACE:
             return actions.TakeStairsAction(player)
         return action # No valid key was pressed
 
@@ -471,20 +463,26 @@ class GameOverEventHandler(EventHandler):
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         self.on_quit()
-
+    
+    def ev_menu(self) -> None:
+        winsound.PlaySound(None, 0)
+        if os.path.exists("savegame.sav"):
+            os.remove("savegame.sav")  # Deletes the active save file.
+        print([sys.executable]+sys.argv)
+        os.execl(sys.executable,*([sys.executable]+sys.argv))
+        """
+        import setup_game
+        print("working")
+        return setup_game.MainMenu()
+        """
+    
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == tcod.event.K_ESCAPE:
+        if event.sym == tcod.event.KeySym.ESCAPE:
             self.on_quit()
-        #elif event.sym == tcod.event.K_e:
-        #    self.BaseEventHandler = setup_game.MainMenu()
-        elif event.sym == tcod.event.K_v:
+        elif event.sym == tcod.event.KeySym.v:
             self.engine.event_handler = HistoryViewer(self.engine)
-        """elif event.sym == tcod.event.K_p:
-            self.engine.game_world = GameWorld(
-                engine=self.engine,
-                map_width=90,
-                map_height=61
-            )"""
+        elif event.sym == tcod.event.KeySym.p:
+            self.ev_menu()
     
 class HistoryViewer(EventHandler):
     """Print the history on a larger window which can be navigated."""

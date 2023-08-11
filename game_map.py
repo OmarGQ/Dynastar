@@ -70,7 +70,7 @@ class GameMap:
         return 0 <= x < self.width and 0 <= y < self.height
 
     def render(self, console: Console) -> None:
-        console.tiles_rgb[0:self.width, 0:self.height] = self.tiles["light"]
+        console.rgb[0:self.width, 0:self.height] = self.tiles["light"]
         """
         Renders the map.
  
@@ -175,7 +175,6 @@ def get_size_values(
     current_rooms = 7
 
     for floor_minimum, min_value, max_value, rooms in weighted_chances_by_floor:
-        print(floor_minimum)
         if floor_minimum > floor:
             break
         else:
