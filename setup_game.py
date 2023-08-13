@@ -20,7 +20,6 @@ import input_handlers
 import winsound
 from engine import Engine
 from game_map import GameWorld
-from cavegen import generate_terrain, generate_rooms
 from tcod import libtcodpy
 
 

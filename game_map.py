@@ -11,13 +11,12 @@ import numpy as np
 from tcod.console import Console
 from entity import Actor, Item
 import tile_types
-import random
 
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Entity
 
-# level, min, max, rooms
+"""(level, Min, Max, Rooms)"""
 room_size_by_floor = [
     (1, 8, 12, 7),
     (2, 7, 11, 7),
@@ -38,7 +37,6 @@ class GameMap:
         self.explored = np.full(
             (width, height), fill_value=False, order="F"
         )  # Tiles the player has seen before
-    
         self.downstairs_location = (0, 0)
     
     @property
@@ -125,23 +123,7 @@ class GameWorld:
 
         self.current_floor = current_floor
         self.complexity = 0.08
-    """
-    def generate_floor(self) -> None:
-        from procgen import generate_dungeon
 
-        self.current_floor += 1
-
-        self.engine.game_map = generate_dungeon(
-            max_rooms=self.max_rooms,
-            room_min_size=self.room_min_size,
-            room_max_size=self.room_max_size,
-            map_width=self.map_width,
-            map_height=self.map_height,
-            max_monsters_per_room=self.max_monsters_per_room,
-            max_items_per_room=self.max_items_per_room,
-            engine=self.engine,
-        )
-    """
     def generate_floor(self) -> None:
         from cavegen import generate_terrain, generate_rooms
 

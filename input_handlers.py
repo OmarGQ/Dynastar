@@ -46,12 +46,17 @@ MOVE_KEYS = {
     tcod.event.KeySym.KP_7: (-1, -1),
     tcod.event.KeySym.KP_8: (0, -1),
     tcod.event.KeySym.KP_9: (1, -1),
+    #ASWD
+    tcod.event.KeySym.w: (0, -1),
+    tcod.event.KeySym.s: (0, 1),
+    tcod.event.KeySym.a: (-1, 0),
+    tcod.event.KeySym.d: (1, 0),
 }
 
 WAIT_KEYS = {
     tcod.event.KeySym.PERIOD,
     tcod.event.KeySym.KP_5,
-    tcod.event.KeySym.CLEAR,
+    tcod.event.KeySym.SPACE,
 }
 
 CURSOR_Y_KEYS = {
@@ -130,6 +135,7 @@ class EventHandler(BaseEventHandler):
             if not self.engine.player.is_alive:
                 # The player was killed sometime during or after the action.
                 winsound.PlaySound("Music/No_Hope.wav", winsound.SND_ASYNC)
+                self.engine.message_log.add_message("Press E to go back to restart", colors.player_die)
                 return GameOverEventHandler(self.engine)
             elif self.engine.player.level.requires_level_up:
                 return LevelUpEventHandler(self.engine)
@@ -282,7 +288,7 @@ class InventoryEventHandler(AskUserEventHandler):
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         player = self.engine.player
         key = event.sym
-        index = key - tcod.event.K_1
+        index = key - tcod.event.KeySym.N1
 
         if 0 <= index <= 9:
             try:
@@ -370,12 +376,7 @@ class SelectIndexHandler(AskUserEventHandler):
         """Called when an index is selected."""
         raise NotImplementedError()
 
-class LookHandler(SelectIndexHandler):
-    """Lets the player look around using the keyboard."""
 
-    def on_index_selected(self, x: int, y: int) -> MainGameEventHandler:
-        """Return to main handler."""
-        return MainGameEventHandler(self.engine)
 
 class AreaRangedAttackHandler(SelectIndexHandler):
     """Handles targeting an area within a given radius. Any entity within the area will be affected."""
@@ -410,10 +411,9 @@ class AreaRangedAttackHandler(SelectIndexHandler):
     def on_index_selected(self, x: int, y: int) -> Optional[Action]:
         return self.callback((x, y))
 
-class MainGameEventHandler(EventHandler):
+class MainGameEventHandler(EventHandler):        
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         action: Optional[Action] = None
-
         key = event.sym
         player = self.engine.player
 
@@ -431,10 +431,8 @@ class MainGameEventHandler(EventHandler):
             return HistoryViewer(self.engine)
         elif key == tcod.event.KeySym.i:
             return InventoryActivateHandler(self.engine)
-        elif key == tcod.event.KeySym.d:
+        elif key == tcod.event.KeySym.o:
             return InventoryDropHandler(self.engine)
-        elif key == tcod.event.KeySym.SLASH: ######################################
-            return LookHandler(self.engine)
         elif key == tcod.event.KeySym.ESCAPE:
             winsound.PlaySound(None, 0)
             raise SystemExit()
@@ -470,18 +468,13 @@ class GameOverEventHandler(EventHandler):
             os.remove("savegame.sav")  # Deletes the active save file.
         print([sys.executable]+sys.argv)
         os.execl(sys.executable,*([sys.executable]+sys.argv))
-        """
-        import setup_game
-        print("working")
-        return setup_game.MainMenu()
-        """
     
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.KeySym.ESCAPE:
             self.on_quit()
         elif event.sym == tcod.event.KeySym.v:
             self.engine.event_handler = HistoryViewer(self.engine)
-        elif event.sym == tcod.event.KeySym.p:
+        elif event.sym == tcod.event.KeySym.e:
             self.ev_menu()
     
 class HistoryViewer(EventHandler):

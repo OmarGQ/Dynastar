@@ -100,26 +100,33 @@ def generate_rooms(
         x = random.randint(0, dungeon.width - room_width - 1)
         y = random.randint(0, dungeon.height - room_height - 1)
 
-        # "RectangularRoom" class makes rectangles easier to work with
         new_room = RectangularRoom(x, y, room_width, room_height)
-
         # Run through the other rooms and see if they intersect with this one.
         if any(new_room.intersects(other_room) for other_room in rooms):
             continue  # This room intersects, so go to the next attempt.
 
         # Clear out the room's inner area.
         dungeon.tiles[new_room.area] = tile_types.wall
-
         if len(rooms) == 0: # The first room, where the player starts.
             player.place(*new_room.center, dungeon)
-        else:  # Make a tunnel between this room and the previous one.
-            for x, y in tunnel_between(rooms[-1].center, new_room.center):
-                dungeon.tiles[x, y] = tile_types.floor
-                center_of_last_room = new_room.center
-            place_entities(new_room, dungeon, engine.game_world.current_floor) #Place enemies
+        else:  #Place enemies and items
+            place_entities(new_room, dungeon, engine.game_world.current_floor) 
         rooms.append(new_room) # Append the new room to the list.
+        
+    """ Make a tunnel between this rooms"""
+    i = 0
+    while True:
+        if rooms[i] == rooms[-1]:
+            break
+        for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
+            dungeon.tiles[x, y] = tile_types.floor
+        i += 1
+    """Replaces the room's floor"""
     for room in rooms:
         dungeon.tiles[room.inner] = tile_types.room_floor
+    """Places the exit"""
+    center_of_last_room = rooms[-1].center
     dungeon.tiles[center_of_last_room] = tile_types.down_stairs
     dungeon.downstairs_location = center_of_last_room
+        
     return dungeon

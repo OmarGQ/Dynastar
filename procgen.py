@@ -6,28 +6,29 @@ Created on Tue Feb 21 16:41:16 2023
 """
 
 from __future__ import annotations
-import random
 from typing import Dict, List, Iterator, Tuple, TYPE_CHECKING
-import tcod
 from game_map import GameMap
-import tile_types
+import random
+import tcod
 import entity_factories
 
 if TYPE_CHECKING:
-    from engine import Engine
     from entity import Entity
-
+    
+"""(Floor, Quantity)"""
 max_items_by_floor = [
     (1, 2),
     (4, 3),
 ]
 
+"""(Floor, Quantity)"""
 max_monsters_by_room = [
     (1, 3),
     (4, 4),
     (6, 5),
 ]
 
+"""Floor: (Item, Probability)"""
 item_chances: Dict[int, List[Tuple[Entity, int]]] = {
     0: [(entity_factories.health_potion, 25), (entity_factories.axe, 5), 
         (entity_factories.mace, 5), (entity_factories.chain_mail, 5)],
@@ -42,6 +43,7 @@ item_chances: Dict[int, List[Tuple[Entity, int]]] = {
         (entity_factories.breast_plate, 0)]
 }
 
+"""Floor: (Enemy, Probability)"""
 enemy_chances: Dict[int, List[Tuple[Entity, int]]] = {
     0: [(entity_factories.skeleton, 40), (entity_factories.zombie, 40), (entity_factories.orc, 20)],
     1: [(entity_factories.orc, 60), (entity_factories.zombie, 20), (entity_factories.skeleton, 20)],
@@ -155,64 +157,3 @@ def tunnel_between(
         yield x, y
     for x, y in tcod.los.bresenham((corner_x, corner_y), (x2, y2)).tolist():
         yield x, y
-
-def generate_dungeon(
-    max_rooms: int,
-    room_min_size: int,
-    room_max_size: int,
-    map_width: int,
-    map_height: int,
-    engine: Engine,
-) -> GameMap:
-    """Generate a new dungeon map."""
-    player = engine.player
-    center_of_last_room = (0, 0)
-    dungeon = GameMap(engine, map_width, map_height, entities=[player])
-
-    rooms: List[RectangularRoom] = []
-
-    for r in range(max_rooms):
-        room_width = random.randint(room_min_size, room_max_size)
-        room_height = random.randint(room_min_size, room_max_size)
-
-        x = random.randint(0, dungeon.width - room_width - 1)
-        y = random.randint(0, dungeon.height - room_height - 1)
-
-        # "RectangularRoom" class makes rectangles easier to work with
-        new_room = RectangularRoom(x, y, room_width, room_height)
-
-        # Run through the other rooms and see if they intersect with this one.
-        if any(new_room.intersects(other_room) for other_room in rooms):
-            continue  # This room intersects, so go to the next attempt.
-        # If there are no intersections then the room is valid.
-
-        # Dig out this rooms inner area.
-        dungeon.tiles[new_room.inner] = tile_types.floor
-
-        if len(rooms) == 0:
-            # The first room, where the player starts.
-            player.place(*new_room.center, dungeon)
-        else:  # All rooms after the first.
-            # Dig out a tunnel between this room and the previous one.
-            #for x, y in tunnel_between(rooms[-1].center, new_room.center):
-            #    dungeon.tiles[x, y] = tile_types.floor
-            center_of_last_room = new_room.center
-        place_entities(new_room, dungeon, engine.game_world.current_floorq)
-        dungeon.tiles[center_of_last_room] = tile_types.down_stairs
-        dungeon.downstairs_location = center_of_last_room
-        
-        # Finally, append the new room to the list.
-        rooms.append(new_room)
-        
-        #"""
-        roomN = 0
-        while True:
-            if rooms[roomN] == rooms[-1]:
-                break
-            x, y = tunnel_between(rooms[roomN].center, rooms[roomN+1].center)
-            dungeon.tiles[x, y] = tile_types.floor
-            roomN += 1
-        #"""
-        
-
-    return dungeon

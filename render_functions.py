@@ -7,7 +7,7 @@ Created on Wed May 24 12:34:06 2023
 
 from __future__ import annotations
 
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import colors
 
 if TYPE_CHECKING:
@@ -110,13 +110,13 @@ def render_ui(console, player, world) -> None:
     else:
         console.print(x=92, y=y, string="(Empty)")
     console.print(x=90, y=26, string="o-Controls--------------o", fg=colors.UI_border)
-    console.print(x=92, y=28, string="'I' use item")
-    console.print(x=92, y=29, string="'D' Drop item'")
-    console.print(x=92, y=30, string="'V' See full log")
-    console.print(x=92, y=31, string="'esc' Exit the game")
-    console.print(x=92, y=32, string="'5' Wait")
-    console.print(x=92, y=33, string="' ' Move")
-    console.print(x=90, y=36, string="o-Information-----------o", fg=colors.UI_border)
+    console.print(x=92, y=28, string="You can move with:\n ASWD, NumPad,\n or ArrowKeys")
+    console.print(x=92, y=32, string="'SPACE' or '5' Wait")
+    console.print(x=92, y=33, string="'I' use item")
+    console.print(x=92, y=34, string="'O' Drop item'")
+    console.print(x=92, y=35, string="'V' See full log")
+    console.print(x=92, y=36, string="'esc' Exit the game")
+    console.print(x=90, y=38, string="o-Information-----------o", fg=colors.UI_border)
     console.print(x=90, y=69, string="o-----------------------o", fg=colors.UI_border)
     
     
