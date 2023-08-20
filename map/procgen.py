@@ -30,27 +30,24 @@ max_monsters_by_room = [
 
 """Floor: (Item, Probability)"""
 item_chances: Dict[int, List[Tuple[Entity, int]]] = {
-    0: [(entity_factories.health_potion, 25), (entity_factories.axe, 5), 
-        (entity_factories.mace, 5), (entity_factories.chain_mail, 5)],
+    0: [(entity_factories.health_potion, 25), (entity_factories.axe, 5), (entity_factories.mace, 5), (entity_factories.chain_mail, 5)],
     2: [(entity_factories.confusion_scroll, 10)],
-    3: [(entity_factories.axe, 0), (entity_factories.breast_plate, 5), 
-        (entity_factories.plate_armor, 5)],
-    4: [(entity_factories.lightning_scroll, 25), (entity_factories.sword, 5), 
-        (entity_factories.health_potion, 25)],
-    6: [(entity_factories.fireball_scroll, 25), (entity_factories.chain_mail, 0), 
-        (entity_factories.long_sword, 5)],
-    8: [(entity_factories.scale_armor, 5), (entity_factories.mace, 0),
-        (entity_factories.breast_plate, 0)]
+    3: [(entity_factories.axe, 0), (entity_factories.breast_plate, 5), (entity_factories.plate_armor, 5)],
+    4: [(entity_factories.lightning_scroll, 25), (entity_factories.sword, 5), (entity_factories.health_potion_Lv2, 25), (entity_factories.health_potion, 5)],
+    6: [(entity_factories.fireball_scroll, 25), (entity_factories.chain_mail, 0), (entity_factories.long_sword, 5)],
+    8: [(entity_factories.scale_armor, 5), (entity_factories.mace, 0), (entity_factories.breast_plate, 0)]
 }
 
 """Floor: (Enemy, Probability)"""
 enemy_chances: Dict[int, List[Tuple[Entity, int]]] = {
     0: [(entity_factories.skeleton, 40), (entity_factories.zombie, 40), (entity_factories.orc, 20)],
     1: [(entity_factories.skeleton, 20), (entity_factories.zombie, 20), (entity_factories.orc, 60)],
-    3: [(entity_factories.troll, 15)],
-    4: [(entity_factories.skeleton, 10), (entity_factories.zombie, 10), (entity_factories.orc, 30), (entity_factories.kobold, 25)],
-    5: [(entity_factories.troll, 30)],
+    4: [(entity_factories.troll, 15)],
+    5: [(entity_factories.skeleton, 5), (entity_factories.zombie, 5), (entity_factories.orc, 5), (entity_factories.kobold, 25)],
+    6: [(entity_factories.super_skeleton, 20), (entity_factories.super_zombie, 20), (entity_factories.super_orc, 30), (entity_factories.troll, 30)],
     7: [(entity_factories.troll, 60), (entity_factories.kobold, 35)],
+    8: [(entity_factories.super_troll, 30), (entity_factories.super_kobold, 20)],
+    9: [(entity_factories.troll, 10), (entity_factories.kobold, 10)],
 }
 
 def get_max_value_for_floor(

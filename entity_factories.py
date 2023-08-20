@@ -30,7 +30,7 @@ orc = Actor(
     name="Orc",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=10, base_defense=0, base_power=4),
+    fighter=Fighter(hp=10, base_defense=0, base_power=3),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=35)
 )
@@ -79,18 +79,74 @@ troll = Actor(
     level=Level(xp_given=100)
 )
 
+super_orc = Actor(
+    char="O",
+    color=(174, 8, 196),
+    name="Orc",
+    ai_cls=HostileEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=18, base_defense=3, base_power=7),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=85)
+)
+ 
+super_skeleton = Actor(
+    char="S",
+    color=(204, 38, 226),
+    name="Skeleton",
+    ai_cls=HostileEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=17, base_defense=5, base_power=6),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=75)
+)
+ 
+super_zombie = Actor(
+    char="Z",
+    color=(224, 58, 246),
+    name="Zombie",
+    ai_cls=SlowEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=12, base_defense=3, base_power=7),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=105)
+)
+ 
+super_kobold = Actor(
+    char="K",
+    color=(255, 0, 43),
+    name="Kobold",
+    ai_cls=HostileEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=22, base_defense=6, base_power=8),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=110)
+)
+
+super_troll = Actor(
+    char="T",
+    color=(2, 201, 2),
+    name="Troll",
+    ai_cls=SlowEnemy,
+    equipment=Equipment(),
+    fighter=Fighter(hp=25, base_defense=5, base_power=10),
+    inventory=Inventory(capacity=0),
+    level=Level(xp_given=150)
+)
+
+
 health_potion = Item(
     char="!",
     color=(127, 0, 255),
     name="Health Potion",
-    consumable=consumable.HealingConsumable(amount=5),
+    consumable=consumable.HealingConsumable(amount=6),
 )
 
 health_potion_Lv2 = Item(
     char="!",
-    color=(127, 0, 255),
+    color=(147, 0, 255),
     name="Health Potion",
-    consumable=consumable.HealingConsumable(amount=10),
+    consumable=consumable.HealingConsumable(amount=12),
 )
 
 lightning_scroll = Item(
