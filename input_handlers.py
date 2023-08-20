@@ -10,7 +10,7 @@ from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
 from tcod import libtcodpy
 import os
 import sys
-import colors
+import render.colors as colors
 import exceptions
 import tcod.event
 import actions

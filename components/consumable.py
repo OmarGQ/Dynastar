@@ -8,7 +8,7 @@ Created on Thu May 25 10:58:45 2023
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 import actions
-import colors
+import render.colors as colors
 import components.inventory
 import components.ai
 from input_handlers import ActionOrHandler, AreaRangedAttackHandler, SingleRangedAttackHandler

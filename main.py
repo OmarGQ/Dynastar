@@ -5,7 +5,7 @@ Created on Tue Feb 21 15:15:47 2023
 @author: kiddra
 """
 import tcod
-import colors
+import render.colors as colors
 import traceback
 import exceptions
 import input_handlers

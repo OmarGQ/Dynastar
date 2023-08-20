@@ -8,7 +8,7 @@ Created on Wed May 24 12:34:06 2023
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-import colors
+import render.colors as colors
 
 if TYPE_CHECKING:
     from tcod import Console

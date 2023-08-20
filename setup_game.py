@@ -14,12 +14,12 @@ import tcod
 import lzma
 import pickle
 import traceback
-import colors
+import render.colors as colors
 import entity_factories
 import input_handlers
 import winsound
 from engine import Engine
-from game_map import GameWorld
+from map.game_map import GameWorld
 from tcod import libtcodpy
 
 

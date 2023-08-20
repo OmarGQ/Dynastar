@@ -8,8 +8,8 @@ Created on Tue May 23 12:42:07 2023
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from components.base_component import BaseComponent
-from render_order import RenderOrder
-import colors
+from render.render_order import RenderOrder
+import render.colors as colors
 
 if TYPE_CHECKING:
     from entity import Actor

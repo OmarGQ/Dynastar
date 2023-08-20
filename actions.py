@@ -7,7 +7,7 @@ Created on Tue Feb 21 15:28:51 2023
 
 from __future__ import annotations
 from typing import Optional, Tuple, TYPE_CHECKING
-import colors
+import render.colors as colors
 import exceptions
 
 if TYPE_CHECKING:

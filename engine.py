@@ -13,11 +13,11 @@ from message_log import MessageLog
 import exceptions
 import lzma
 import pickle
-import render_functions
+import render.render_functions as render_functions
 
 if TYPE_CHECKING:
     from entity import Actor
-    from game_map import GameMap, GameWorld
+    from map.game_map import GameMap, GameWorld
 
 class Engine:
     game_map: GameMap

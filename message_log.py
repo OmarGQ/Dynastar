@@ -8,7 +8,7 @@ Created on Wed May 24 12:48:42 2023
 from typing import Iterable, List, Reversible, Tuple
 import textwrap
 import tcod
-import colors
+import render.colors as colors
 
 class Message:
     def __init__(self, text: str, fg: Tuple[int, int, int]):
