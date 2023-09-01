@@ -10,7 +10,7 @@ from typing import Iterable, Iterator, Optional, TYPE_CHECKING, List, Tuple
 import numpy as np
 from tcod.console import Console
 from entity import Actor, Item
-import tile_types
+import render.tile_types as tile_types
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -77,7 +77,7 @@ class GameMap:
         Otherwise, the default is "SHROUD".
         """
         """
-        console.tiles_rgb[0 : self.width, 0 : self.height] = np.select(
+        console.rgb[0 : self.width, 0 : self.height] = np.select(
             condlist=[self.visible, self.explored],
             choicelist=[self.tiles["light"], self.tiles["dark"]],
             default=tile_types.SHROUD,
@@ -125,14 +125,15 @@ class GameWorld:
         self.complexity = 0.08
 
     def generate_floor(self) -> None:
-        from map.cavegen import generate_terrain, generate_rooms
+        #from map.cavegen import generate_terrain, generate_rooms
+        from map.CA1 import generate_terrain, generate_terrain_2
 
         self.current_floor += 1
         if self.complexity < 0.25:
             self.complexity += 0.01
         
         self.room_min_size, self.room_max_size, self.max_rooms = get_size_values(room_size_by_floor, self.current_floor)
-        
+        """
         self.engine.game_map, noise = generate_terrain(
             map_width = self.map_width,
             map_height = self.map_height,
@@ -147,6 +148,12 @@ class GameWorld:
             map_width = self.map_width,
             map_height = self.map_height,
             engine = self.engine
+        )"""
+        self.engine.game_map= generate_terrain_2(
+            map_width = self.map_width,
+            map_height = self.map_height,
+            engine = self.engine,
+            complexity = self.complexity
         )
 
 def get_size_values(

@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 import random
 import tcod
-import tile_types
+import render.tile_types as tile_types
 from typing import List, TYPE_CHECKING
 from map.game_map import GameMap
 from map.procgen import RectangularRoom, tunnel_between, place_entities

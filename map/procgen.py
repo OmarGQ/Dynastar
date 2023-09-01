@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 """(Floor, Quantity)"""
 max_items_by_floor = [
     (1, 2),
-    (4, 3),
+    (5, 3),
 ]
 
 """(Floor, Quantity)"""

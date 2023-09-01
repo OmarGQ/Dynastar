@@ -134,7 +134,6 @@ super_troll = Actor(
     level=Level(xp_given=150)
 )
 
-
 health_potion = Item(
     char="!",
     color=(127, 0, 255),
