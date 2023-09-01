@@ -13,11 +13,11 @@ from message_log import MessageLog
 import exceptions
 import lzma
 import pickle
-import render_functions
+import render.render_functions as render_functions
 
 if TYPE_CHECKING:
     from entity import Actor
-    from game_map import GameMap, GameWorld
+    from map.game_map import GameMap, GameWorld
 
 class Engine:
     game_map: GameMap
@@ -50,23 +50,20 @@ class Engine:
         # Render map
         self.game_map.render(console)
         # Render interface
-        self.message_log.render(console=console, x=21, y=62, width=60, height=8)
+        self.message_log.render(console=console, x=1, y=62, width=70, height=7)
         
-        render_functions.render_bar(
+        render_functions.render_ui(
             console=console,
-            current_value=self.player.fighter.hp,
-            maximum_value=self.player.fighter.max_hp,
-            total_width=20,
-        )
+            player=self.player,
+            world=self.game_world
+            )
         
-        render_functions.render_dungeon_level(
-            console=console,
-            dungeon_level=self.game_world.current_floor,
-            location=(0, 67),
-        )
-
         render_functions.render_names_at_mouse_location(
-            console=console, x=21, y=61, engine=self
+            console=console, x=92, y=40, engine=self
+        )
+        
+        render_functions.render_names_at_player_location(
+            console=console, x=92, y=44, engine=self
         )
         
     def save_as(self, filename: str) -> None:

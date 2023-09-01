@@ -8,7 +8,7 @@ Created on Thu May 25 10:58:45 2023
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 import actions
-import colors
+import render.colors as colors
 import components.inventory
 import components.ai
 from input_handlers import ActionOrHandler, AreaRangedAttackHandler, SingleRangedAttackHandler
@@ -148,4 +148,19 @@ class ConfusionConsumable(Consumable):
         target.ai = components.ai.ConfusedEnemy(
             entity=target, previous_ai=target.ai, turns_remaining=self.number_of_turns,
         )
+        self.consume()
+        
+class DefenceConsumable(Consumable):
+    def __init__(self, amount: int):
+        self.amount = amount
+
+    def activate(self, action: actions.ItemAction) -> None:
+        consumer = action.entity
+        target = action.target_actor
+
+        self.engine.message_log.add_message(
+            f"The eyes of the {target.name} look vacant, as it starts to stumble around!",
+            colors.status_effect_applied,
+        )
+        consumer.fighter.base_defense += self.amount
         self.consume()

@@ -5,12 +5,12 @@ Created on Tue Feb 21 15:15:47 2023
 @author: kiddra
 """
 import tcod
-import colors
+import render.colors as colors
 import traceback
 import exceptions
 import input_handlers
 import setup_game
-
+    
 def save_game(handler: input_handlers.BaseEventHandler, filename: str) -> None:
     """If the current event handler has an active Engine then save it."""
     if isinstance(handler, input_handlers.EventHandler):
@@ -18,7 +18,7 @@ def save_game(handler: input_handlers.BaseEventHandler, filename: str) -> None:
         print("Game saved.")
 
 def main() -> None:
-    screen_width = 90
+    screen_width = 116
     screen_height = 70
 
     tileset = tcod.tileset.load_tilesheet(
@@ -32,16 +32,18 @@ def main() -> None:
         screen_width,
         screen_height,
         tileset=tileset,
-        title="Dungeon gen",
+        title="Dynastar",
         vsync=True,
     ) as context:
-        root_console = tcod.Console(screen_width, screen_height, order="F")
+        root_console = tcod.console.Console(screen_width, screen_height, order="F")
         try:
             while True:
                 root_console.clear()
                 handler.on_render(console=root_console)
                 context.present(root_console)
-
+                #Full screen
+                #context.sdl_window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
+                
                 try:
                     for event in tcod.event.wait():
                         context.convert_event(event)
