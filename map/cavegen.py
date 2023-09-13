@@ -11,7 +11,7 @@ import random
 import tcod
 import tile_types
 from perlin_noise import PerlinNoise
-from perlin_numpy import generate_perlin_noise_2d, generate_fractal_noise_2d
+from perlin_numpy import generate_fractal_noise_2d
 from typing import List, TYPE_CHECKING
 from map.game_map import GameMap
 from map.procgen import RectangularRoom, tunnel_between, place_entities
@@ -48,38 +48,6 @@ def generate_terrain(
                 terrain.tiles[i][j] = tile_types.floor
             elif samples[j][i]<200:
                 terrain.tiles[i][j] = tile_types.tree
-    """
-    noise = tcod.noise.Noise(
-        dimensions=2,
-        algorithm=4,
-        implementation=tcod.noise.SIMPLE,
-        hurst=0.5,
-        lacunarity=3.0,
-        octaves=4,
-        seed=None,
-        )
-    ogrid = [np.arange(map_width, dtype=np.float32),
-             np.arange(map_height, dtype=np.float32)]
-
-    # Scale the grid.
-    ogrid[0] *= 0.20
-    ogrid[1] *= 0.20
-
-    # Return the sampled noise from this grid of points.
-    samples = noise.sample_ogrid(ogrid)
-
-    cave = GameMap(map_width, map_height, entities=[player]))
-    for i in range(map_width):
-        for j in range(map_height):
-            if samples[i][j]<-0.4:
-                cave.tiles[i][j] = tile_types.water
-            elif samples[i][j]<0.1:
-                cave.tiles[i][j] = tile_types.floor
-            elif samples[i][j]<.3:
-                cave.tiles[i][j] = tile_types.tree
-            else:
-                 cave.tiles[i][j] = tile_types.wall  
-    """
     return terrain, samples
 
 def generate_terrain_2(
@@ -139,9 +107,9 @@ def generate_terrain_3(
         for j in range(map_height):
             if samples[j][i]<40:
                 terrain.tiles[i][j] = tile_types.water
-            elif samples[j][i]<145:
+            elif samples[j][i]<160:
                 terrain.tiles[i][j] = tile_types.floor
-            elif samples[j][i]<170:
+            elif samples[j][i]<175:
                 terrain.tiles[i][j] = tile_types.tree
     return terrain, samples
 

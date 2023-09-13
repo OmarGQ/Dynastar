@@ -8,7 +8,7 @@ Created on Sat Aug 19 17:14:57 2023
 from __future__ import annotations
 import numpy as np
 import random
-import render.tile_types as tile_types
+import tile_types as tile_types
 from typing import List, TYPE_CHECKING
 from map.game_map import GameMap
 
@@ -24,7 +24,7 @@ deadLimit = 4
 birthLimit = 5
 numberOfSteps = 4
 
-def generate_terrain(
+def CA(
     map_width: int,
     map_height: int,
     engine: Engine,
@@ -78,7 +78,7 @@ def generate_terrain(
     				else:
     					new_map[i][j] = FLOOR
 
-    return translate(new_map, terrain)
+    return translate(new_map, terrain), new_map
 
 def countAliveNeighbours(map, x, y, shape):
     count = 0
@@ -111,7 +111,7 @@ def doSimulationStep(oldMap, shape):
                     new_map[x][y] = WALL
     return new_map
 
-def generate_terrain_2(
+def CA_2(
     map_width: int,
     map_height: int,
     engine: Engine,
@@ -130,7 +130,7 @@ def generate_terrain_2(
     for i in range(0, numberOfSteps):
         new_map = doSimulationStep(new_map, shape);
 
-    return translate(new_map, terrain)
+    return translate(new_map, terrain), new_map
         
         
 def translate(matrix, terrain):
