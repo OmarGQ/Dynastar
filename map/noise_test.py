@@ -14,8 +14,7 @@ from map.game_map import GameMap
 if TYPE_CHECKING:
     from engine import Engine
      
-    
-    
+
 def Simplex(
     map_width: int,
     map_height: int,
@@ -23,7 +22,6 @@ def Simplex(
     complexity: float
 ) -> GameMap:
     """Generate a new terrain map."""
-    #"""
     player = engine.player
     terrain = GameMap(engine, map_width, map_height, entities=[player])
     # Set noise
@@ -32,8 +30,8 @@ def Simplex(
         algorithm=2,
         implementation=tcod.noise.Implementation.SIMPLE,
         hurst=0.5,
-        lacunarity=3.0,
-        octaves=4,
+        lacunarity=8,
+        octaves=8,
         seed=None,
         )
     ogrid = [np.arange(map_width, dtype=np.float32),
@@ -63,7 +61,6 @@ def Perlin(
     complexity: float
 ) -> GameMap:
     """Generate a new terrain map."""
-    #"""
     player = engine.player
     terrain = GameMap(engine, map_width, map_height, entities=[player])
     # Set noise
@@ -103,17 +100,16 @@ def Wavelet(
     complexity: float
 ) -> GameMap:
     """Generate a new terrain map."""
-    #"""
     player = engine.player
     terrain = GameMap(engine, map_width, map_height, entities=[player])
     # Set noise
     noise = tcod.noise.Noise(
         dimensions=2,
         algorithm=4,
-        implementation=tcod.noise.Implementation.SIMPLE,
+        implementation=tcod.noise.Implementation.TURBULENCE,
         hurst=0.5,
         lacunarity=3.0,
-        octaves=4,
+        octaves=2,
         seed=None,
         )
     ogrid = [np.arange(map_width, dtype=np.float32),
@@ -128,10 +124,20 @@ def Wavelet(
 
     for i in range(map_width):
         for j in range(map_height):
-            if samples[i][j]<-0.7:
-                terrain.tiles[i][j] = tile_types.water
-            elif samples[i][j]<0.09:
+            if samples[i][j]<0.4:
                 terrain.tiles[i][j] = tile_types.floor
-            elif samples[i][j]<0.2:
+            elif samples[i][j]<0.7:
                 terrain.tiles[i][j] = tile_types.tree
     return terrain , samples
+
+def Dungeon(
+    map_width: int,
+    map_height: int,
+    engine: Engine,
+    complexity: float
+) -> GameMap:
+    """Generate a new terrain map."""
+    player = engine.player
+    terrain = GameMap(engine, map_width, map_height, entities=[player])
+    
+    return terrain, terrain

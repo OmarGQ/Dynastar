@@ -126,8 +126,10 @@ class GameWorld:
 
     def generate_floor(self) -> None:
         from map.cavegen import generate_terrain, generate_rooms, generate_terrain_2, generate_terrain_3
-        from map.noise_test import Perlin, Simplex, Wavelet
-        from map.CA1 import CA, CA_2
+        from map.noise_test import Perlin, Simplex, Wavelet, Dungeon
+        from map.CA1 import CA
+        
+        extra = 1
         
         self.current_floor += 1
         if self.complexity < 0.25:
@@ -135,17 +137,19 @@ class GameWorld:
         
         self.room_min_size, self.room_max_size, self.max_rooms = get_size_values(room_size_by_floor, self.current_floor)
         
-        self.engine.game_map, noise = generate_terrain(
+        self.engine.game_map, noise = Dungeon(
             map_width = self.map_width,
             map_height = self.map_height,
             engine = self.engine,
             complexity = self.complexity
         )
+        #if True:
+        #    extra = 1.5
         self.engine.game_map = generate_rooms(
             dungeon = self.engine.game_map,
-            max_rooms = self.max_rooms,
-            room_min_size = self.room_min_size,
-            room_max_size = self.room_max_size,
+            max_rooms = int(self.max_rooms * extra),
+            room_min_size = int(self.room_min_size * extra),
+            room_max_size = int(self.room_max_size * extra),
             map_width = self.map_width,
             map_height = self.map_height,
             engine = self.engine
