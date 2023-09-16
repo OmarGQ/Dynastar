@@ -18,15 +18,14 @@ if TYPE_CHECKING:
 
 """(level, Min, Max, Rooms)"""
 room_size_by_floor = [
-    (1, 8, 12, 7),
-    (2, 7, 11, 7),
-    (4, 6, 10, 8),
+    (1, 9, 13, 7),
+    (3, 7, 11, 7),
+    (5, 6, 10, 8),
     (7, 6, 8, 10),
 ]
 
 class GameMap:
-    def __init__(
-        self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()):
+    def __init__(self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()):
         self.engine = engine
         self.width, self.height = width, height
         self.entities = set(entities)
@@ -125,26 +124,27 @@ class GameWorld:
         self.complexity = 0.08
 
     def generate_floor(self) -> None:
-        from map.cavegen import generate_terrain, generate_rooms, generate_terrain_2, generate_terrain_3
-        from map.noise_test import Perlin, Simplex, Wavelet, Dungeon
-        from map.CA1 import CA
+        from map.cavegen import generate_terrain, generate_rooms
         
         extra = 1
-        
+        version = "Simplex"
         self.current_floor += 1
         if self.complexity < 0.25:
             self.complexity += 0.01
         
         self.room_min_size, self.room_max_size, self.max_rooms = get_size_values(room_size_by_floor, self.current_floor)
         
-        self.engine.game_map, noise = Dungeon(
+        self.engine.game_map, noise = generate_terrain(
             map_width = self.map_width,
             map_height = self.map_height,
             engine = self.engine,
-            complexity = self.complexity
+            complexity = self.complexity,
+            version = version
         )
-        #if True:
-        #    extra = 1.5
+        
+        if version == "Dungeon":
+            extra = 1.7
+            
         self.engine.game_map = generate_rooms(
             dungeon = self.engine.game_map,
             max_rooms = int(self.max_rooms * extra),

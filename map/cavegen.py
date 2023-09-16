@@ -10,8 +10,6 @@ import numpy as np
 import random
 import tcod
 import tile_types
-from perlin_noise import PerlinNoise
-from perlin_numpy import generate_fractal_noise_2d
 from typing import List, TYPE_CHECKING
 from map.game_map import GameMap
 from map.procgen import RectangularRoom, tunnel_between, place_entities
@@ -19,99 +17,109 @@ from map.procgen import RectangularRoom, tunnel_between, place_entities
 if TYPE_CHECKING:
     from engine import Engine
 
+#algorithm, implementation, lacunarity, octaves, maping values
+parameters = {
+    "Simplex": [2, tcod.noise.Implementation.SIMPLE, 8, 8, [-0.7, 0.2, 0.5]],
+    "Perlin":  [1, tcod.noise.Implementation.SIMPLE, 3, 4, [-0.3, 0.1, 0.3]],
+    "Wavelet": [4, tcod.noise.Implementation.TURBULENCE, 3, 2, [-1, 0.4, 0.7]]
+    }
+
 def generate_terrain(
     map_width: int,
     map_height: int,
     engine: Engine,
-    complexity: float
-):
+    complexity: float,
+    version: str
+) -> GameMap:
     """Generate a new terrain map."""
     player = engine.player
     terrain = GameMap(engine, map_width, map_height, entities=[player])
-    # Set noise
+    
+    if version == "Dungeon":
+        return terrain, terrain
+    elif version == "CA":
+        return CA(map_width, map_height, terrain)
+    else:
+        values = parameters[version]
+        tile_v = values[4]
+    """Set noise function"""
     noise = tcod.noise.Noise(
-         dimensions=2,
-         algorithm=tcod.noise.Algorithm.SIMPLEX)
-    # Generate noise grid
-    samples = noise[tcod.noise.grid(
-        shape=(map_width, map_height), 
-        scale = complexity,
-        origin=(map_width/2, map_height/2))]
-    # Scale grid.
-    samples = ((samples + 1.0) * (256 / 2)).astype(np.uint8) 
-    # Set tiles
+        dimensions=2,
+        algorithm=values[0],
+        implementation=values[1],
+        hurst=0.5,
+        lacunarity=values[2],
+        octaves=values[3],
+        seed=None,
+        )
+    ogrid = [np.arange(map_width, dtype=np.float32),
+             np.arange(map_height, dtype=np.float32)]
+
+    """"Scale the grid"""
+    ogrid[0] *= complexity
+    ogrid[1] *= complexity
+
+    """Return the sampled noise from this grid of points"""
+    samples = noise.sample_ogrid(ogrid)
     for i in range(map_width):
         for j in range(map_height):
-            if samples[j][i]<40:
+            if samples[i][j]<tile_v[0]:
                 terrain.tiles[i][j] = tile_types.water
-            elif samples[j][i]<155:
+            elif samples[i][j]<tile_v[1]:
                 terrain.tiles[i][j] = tile_types.floor
-            elif samples[j][i]<200:
+            elif samples[i][j]<tile_v[2]:
                 terrain.tiles[i][j] = tile_types.tree
     return terrain, samples
 
-def generate_terrain_2(
+def CA(
     map_width: int,
     map_height: int,
-    engine: Engine,
-    complexity: float
+    terrain: GameMap
 ):
-    """Generate a new terrain map."""
-    player = engine.player
-    terrain = GameMap(engine, map_width, map_height, entities=[player])
-    # Set noise
-    noise1 = PerlinNoise(octaves=3*complexity+3)
-    noise2 = PerlinNoise(octaves=6*complexity+6)
-    noise3 = PerlinNoise(octaves=12*complexity+12)
-    noise4 = PerlinNoise(octaves=24*complexity+24)
+    fill_prob = 0.4    
+    """Generate initial random map"""
+    shape = (map_width, map_height)
+    new_map = np.ones(shape)
+    for i in range(shape[0]):
+    	for j in range(shape[1]):
+    		choice = random.uniform(0, 1)
+    		new_map[i][j] = 0 if choice < fill_prob else 1
 
-    xpix, ypix = map_height, map_width
-    noise = []
-    for i in range(xpix):
-        row = []
-        for j in range(ypix):
-            noise_val = noise1([i/xpix, j/ypix])
-            noise_val += 0.5 * noise2([i/xpix, j/ypix])
-            noise_val += 0.25 * noise3([i/xpix, j/ypix])
-            noise_val += 0.125 * noise4([i/xpix, j/ypix])
+    """run for 6 generations"""
+    generations = 6
+    for generation in range(generations):
+    	for i in range(shape[0]):
+    		for j in range(shape[1]): # Count walls around the cell
+    			submap = new_map[max(i-1, 0):min(i+2, new_map.shape[0]),max(j-1, 0):min(j+2, new_map.shape[1])]
+    			wallcount_1away = len(np.where(submap.flatten() == 0)[0])
+    			submap = new_map[max(i-2, 0):min(i+3, new_map.shape[0]),max(j-2, 0):min(j+3, new_map.shape[1])]
+    			wallcount_2away = len(np.where(submap.flatten() == 0)[0])
+    			"""for first five generations build a scaffolding of walls"""
+    			if generation < 5:
+    				if wallcount_1away >= 5 or wallcount_2away <= 7:
+    					new_map[i][j] = 0
+    				else:
+    					new_map[i][j] = 1
+    				if i==0 or j == 0 or i == shape[0]-1 or j == shape[1]-1:
+    					new_map[i][j] = 0 
+    			else:
+    				"""For the last generation generate openings"""
+    				if wallcount_1away >= 5:
+    					new_map[i][j] = 0
+    				else:
+    					new_map[i][j] = 1
 
-            row.append(noise_val)
-        noise.append(row)   
-    samples = np.array(noise)
-    samples = ((samples + 1.0) * (256 / 2)).astype(np.uint8)
-    for i in range(map_width):
-        for j in range(map_height):
-            if samples[j][i]<90:
-                terrain.tiles[i][j] = tile_types.water
-            elif samples[j][i]<135:
+    return translate_CA(new_map, terrain), new_map    
+        
+def translate_CA(matrix, terrain):
+    """Turns the generated terrain into a functional map"""
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            if matrix[i][j] == 0:
+                terrain.tiles[i][j] = tile_types.wall
+            else:
                 terrain.tiles[i][j] = tile_types.floor
-            elif samples[j][i]<145:
-                terrain.tiles[i][j] = tile_types.tree
-    return terrain, samples
-
-def generate_terrain_3(
-    map_width: int,
-    map_height: int,
-    engine: Engine,
-    complexity: float
-):
-    """Generate a new terrain map."""
-    player = engine.player
-    terrain = GameMap(engine, map_width, map_height, entities=[player])
-    # Set noise
-    noise = generate_fractal_noise_2d((100, 100), (5, 5), 3)
-    # Scale grid.
-    samples = ((noise + 1.0) * (256 / 2)).astype(np.uint8) 
-    # Set tiles
-    for i in range(map_width):
-        for j in range(map_height):
-            if samples[j][i]<40:
-                terrain.tiles[i][j] = tile_types.water
-            elif samples[j][i]<160:
-                terrain.tiles[i][j] = tile_types.floor
-            elif samples[j][i]<175:
-                terrain.tiles[i][j] = tile_types.tree
-    return terrain, samples
+    return terrain
 
 def generate_rooms(
     dungeon: GameMap,
