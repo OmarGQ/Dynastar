@@ -11,6 +11,7 @@ import numpy as np
 from tcod.console import Console
 from entity import Actor, Item
 import tile_types
+import random
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -23,6 +24,8 @@ room_size_by_floor = [
     (5, 6, 10, 8),
     (7, 6, 8, 10),
 ]
+
+generation = ["Perlin", "Simplex", "Wavelet", "Dungeon", "CA"] 
 
 class GameMap:
     def __init__(self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()):
@@ -126,13 +129,12 @@ class GameWorld:
     def generate_floor(self) -> None:
         from map.cavegen import generate_terrain, generate_rooms
         
-        extra = 1
-        version = "Simplex"
         self.current_floor += 1
         if self.complexity < 0.25:
             self.complexity += 0.01
-        
         self.room_min_size, self.room_max_size, self.max_rooms = get_size_values(room_size_by_floor, self.current_floor)
+        extra = 1
+        version = random.choice(generation)
         
         self.engine.game_map, noise = generate_terrain(
             map_width = self.map_width,
@@ -143,12 +145,16 @@ class GameWorld:
         )
         
         if version == "Dungeon":
-            extra = 1.7
+            extra = 2
+        elif version == "CA":
+            self.room_min_size = 9
+            self.room_max_size = 13
+            self.max_rooms = 3
             
         self.engine.game_map = generate_rooms(
             dungeon = self.engine.game_map,
             max_rooms = int(self.max_rooms * extra),
-            room_min_size = int(self.room_min_size * extra),
+            room_min_size = int(self.room_min_size),
             room_max_size = int(self.room_max_size * extra),
             map_width = self.map_width,
             map_height = self.map_height,

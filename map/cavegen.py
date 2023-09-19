@@ -76,7 +76,7 @@ def CA(
     map_height: int,
     terrain: GameMap
 ):
-    fill_prob = 0.4    
+    fill_prob = 0.4  
     """Generate initial random map"""
     shape = (map_width, map_height)
     new_map = np.ones(shape)

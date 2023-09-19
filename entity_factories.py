@@ -187,17 +187,17 @@ leather_armor = Item(char="[",
 )
 
 chain_mail = Item(
-    char="[", color=(139, 69, 19), name="Chain Mail", equippable=equippable.ChainMail()
+    char="↓", color=(139, 69, 19), name="Chain Mail", equippable=equippable.ChainMail()
 )
 
 breast_plate = Item(
-    char="[", color=(209, 205, 194), name="Breast Plate", equippable=equippable.BreastPlate()
+    char="↓", color=(209, 205, 194), name="Breast Plate", equippable=equippable.BreastPlate()
 )
 
 plate_armor = Item(
-    char="[", color=(148, 143, 129), name="Plate Armor", equippable=equippable.PlateArmor()
+    char="↓", color=(148, 143, 129), name="Plate Armor", equippable=equippable.PlateArmor()
 )
 
 scale_armor = Item(
-    char="[", color=(158, 5, 5), name="Scale Armor", equippable=equippable.ScaleArmor()
+    char="↓", color=(158, 5, 5), name="Scale Armor", equippable=equippable.ScaleArmor()
 )

@@ -95,9 +95,7 @@ class WaitAction(Action):
 
 class TakeStairsAction(Action):
     def perform(self) -> None:
-        """
-        Take the stairs, if any exist at the entity's location.
-        """
+        """Take the stairs, if any exist at the entity's location"""
         self.engine.game_world.generate_floor()
         self.engine.message_log.add_message(
             "You descend the staircase.", colors.descend
