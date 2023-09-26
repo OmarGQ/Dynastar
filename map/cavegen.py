@@ -17,10 +17,10 @@ from map.procgen import RectangularRoom, tunnel_between, place_entities
 if TYPE_CHECKING:
     from engine import Engine
 
-#algorithm, implementation, lacunarity, octaves, maping values
+#algorithm, implementation, lacunarity, octaves, map values
 parameters = {
     "Simplex": [2, tcod.noise.Implementation.SIMPLE, 8, 8, [-0.7, 0.2, 0.5]],
-    "Perlin":  [1, tcod.noise.Implementation.SIMPLE, 3, 4, [-0.3, 0.1, 0.3]],
+    "Perlin":  [1, tcod.noise.Implementation.FBM, 3, 4, [-0.3, 0.1, 0.3]],
     "Wavelet": [4, tcod.noise.Implementation.TURBULENCE, 3, 2, [-1, 0.4, 0.7]]
     }
 
@@ -31,18 +31,18 @@ def generate_terrain(
     complexity: float,
     version: str
 ) -> GameMap:
-    """Generate a new terrain map."""
+    """Generate a new GameMap."""
     player = engine.player
     terrain = GameMap(engine, map_width, map_height, entities=[player])
     
     if version == "Dungeon":
         return terrain, terrain
-    elif version == "CA":
+    elif version == "Cave":
         return CA(map_width, map_height, terrain)
     else:
         values = parameters[version]
         tile_v = values[4]
-    """Set noise function"""
+    """Noise function"""
     noise = tcod.noise.Noise(
         dimensions=2,
         algorithm=values[0],

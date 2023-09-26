@@ -58,7 +58,7 @@ zombie = Actor(
 )
  
 kobold = Actor(
-    char="K",
+    char="▲",
     color=(164, 15, 15),
     name="Kobold",
     ai_cls=HostileEnemy,
@@ -69,7 +69,7 @@ kobold = Actor(
 )
 
 troll = Actor(
-    char="T",
+    char="▼",
     color=(0, 127, 0),
     name="Troll",
     ai_cls=SlowEnemy,
@@ -113,7 +113,7 @@ super_zombie = Actor(
 )
  
 super_kobold = Actor(
-    char="K",
+    char="▲",
     color=(255, 0, 43),
     name="Kobold",
     ai_cls=HostileEnemy,
@@ -124,7 +124,7 @@ super_kobold = Actor(
 )
 
 super_troll = Actor(
-    char="T",
+    char="▼",
     color=(2, 201, 2),
     name="Troll",
     ai_cls=SlowEnemy,

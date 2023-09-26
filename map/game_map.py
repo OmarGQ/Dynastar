@@ -23,9 +23,10 @@ room_size_by_floor = [
     (3, 7, 11, 7),
     (5, 6, 10, 8),
     (7, 6, 8, 10),
+    (9, 5, 8, 12)
 ]
 
-generation = ["Perlin", "Simplex", "Wavelet", "Dungeon", "CA"] 
+generation = ["Perlin", "Simplex", "Wavelet", "Dungeon", "Cave"] 
 
 class GameMap:
     def __init__(self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()):
@@ -146,7 +147,7 @@ class GameWorld:
         
         if version == "Dungeon":
             extra = 2
-        elif version == "CA":
+        elif version == "Cave":
             self.room_min_size = 9
             self.room_max_size = 13
             self.max_rooms = 3
