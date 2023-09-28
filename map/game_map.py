@@ -21,9 +21,9 @@ if TYPE_CHECKING:
 room_size_by_floor = [
     (1, 9, 13, 7),
     (3, 7, 11, 7),
-    (5, 6, 10, 8),
-    (7, 6, 8, 10),
-    (9, 5, 8, 12)
+    (5, 7, 10, 8),
+    (7, 7, 9, 10),
+    (9, 7, 8, 12)
 ]
 
 generation = ["Perlin", "Simplex", "Wavelet", "Dungeon", "Cave"] 
@@ -137,42 +137,23 @@ class GameWorld:
         extra = 1
         version = random.choice(generation)
         
-        self.engine.game_map, noise = generate_terrain(
-            map_width = self.map_width,
-            map_height = self.map_height,
-            engine = self.engine,
-            complexity = self.complexity,
-            version = "Simplex"
-        )
-        
         if version == "Dungeon":
             extra = 2
         elif version == "Cave":
             self.room_min_size = 9
             self.room_max_size = 13
             self.max_rooms = 3
-        """    
-        self.engine.game_map = generate_rooms(
-            dungeon = self.engine.game_map,
-            max_rooms = int(self.max_rooms * extra),
-            room_min_size = int(self.room_min_size),
-            room_max_size = int(self.room_max_size * extra),
-            map_width = self.map_width,
-            map_height = self.map_height,
-            engine = self.engine
-        )"""
-        dungeon, rooms= locate_rooms(
-            dungeon = self.engine.game_map,
-            max_rooms = int(self.max_rooms * extra),
-            room_min_size = int(self.room_min_size),
-            room_max_size = int(self.room_max_size * extra),
+            
+        self.engine.game_map = generate_terrain(
             map_width = self.map_width,
             map_height = self.map_height,
             engine = self.engine,
-            noise = noise
+            complexity = self.complexity,
+            version = version,
+            max_rooms = int(self.max_rooms * extra),
+            room_min_size = int(self.room_min_size * extra),
+            room_max_size = int(self.room_max_size * extra),
         )
-        #print(dungeon)
-        #print(rooms)
         
 def get_size_values(
     weighted_chances_by_floor: List[Tuple[int, int, int, int]], floor: int

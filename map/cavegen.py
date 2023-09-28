@@ -29,16 +29,37 @@ def generate_terrain(
     map_height: int,
     engine: Engine,
     complexity: float,
-    version: str
+    version: str,
+    max_rooms: int,
+    room_min_size: int,
+    room_max_size: int,
 ) -> GameMap:
     """Generate a new GameMap."""
     player = engine.player
     terrain = GameMap(engine, map_width, map_height, entities=[player])
     
     if version == "Dungeon":
-        return terrain, terrain
+        return generate_rooms(
+            dungeon = terrain,
+            max_rooms = max_rooms,
+            room_min_size = room_min_size,
+            room_max_size = room_max_size,
+            map_width = map_width,
+            map_height = map_height,
+            engine = engine
+        )
+        
     elif version == "Cave":
-        return CA(map_width, map_height, terrain)
+        return generate_rooms(
+            dungeon = CA(map_width, map_height, terrain),
+            max_rooms = max_rooms,
+            room_min_size = room_min_size,
+            room_max_size = room_max_size,
+            map_width = map_width,
+            map_height = map_height,
+            engine = engine
+        )
+    
     else:
         values = parameters[version]
         tile_v = values[4]
@@ -61,15 +82,11 @@ def generate_terrain(
 
     """Return the sampled noise from this grid of points"""
     samples = noise.sample_ogrid(ogrid)
-    for i in range(map_width):
-        for j in range(map_height):
-            if samples[i][j]<tile_v[0]:
-                terrain.tiles[i][j] = tile_types.water
-            elif samples[i][j]<tile_v[1]:
-                terrain.tiles[i][j] = tile_types.floor
-            elif samples[i][j]<tile_v[2]:
-                terrain.tiles[i][j] = tile_types.tree
-    return terrain, samples
+    samples1, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, samples)
+    if(samples.all != samples1.all):
+        print(True)
+    terrain = set_rooms(terrain, map_width, map_height, engine, rooms, tile_v, samples1)
+    return terrain
 
 def locate_rooms(dungeon: GameMap,
     max_rooms: int,
@@ -87,8 +104,8 @@ def locate_rooms(dungeon: GameMap,
             room_width = random.randint(room_min_size, room_max_size)
             room_height = random.randint(room_min_size, room_max_size)
     
-            x = random.randint(0, dungeon.width - room_width - 1)
-            y = random.randint(0, dungeon.height - room_height - 1)
+            x = random.randint(2, dungeon.width - room_width - 3)
+            y = random.randint(2, dungeon.height - room_height - 3)
     
             new_room = RectangularRoom(x, y, room_width, room_height)
             # Run through the other rooms and see if they intersect with this one.
@@ -97,24 +114,30 @@ def locate_rooms(dungeon: GameMap,
 
             mean = np.average(noise[new_room.area])
             if mean > 0.1:
-                noise[new_room.sourindingd_area]*0.8
+                noise[new_room.sourindingd_area] *= 0.6
                 if len(rooms) == 0: # The first room, where the player starts.
                     player.place(*new_room.center, dungeon)
                 rooms.append(new_room) # Append the new room to the list.
-        print(len(rooms))
     return noise, rooms
 
 def set_rooms(
     dungeon: GameMap,
-    max_rooms: int,
-    room_min_size: int,
-    room_max_size: int,
     map_width: int,
     map_height: int,
     engine: Engine,
     rooms: np.array,
-    noise
+    tiles,
+    samples
 ) -> GameMap:
+    for i in range(map_width):
+        for j in range(map_height):
+            if samples[i][j]<tiles[0]:
+                dungeon.tiles[i][j] = tile_types.water
+            elif samples[i][j]<tiles[1]:
+                dungeon.tiles[i][j] = tile_types.floor
+            elif samples[i][j]<tiles[2]:
+                dungeon.tiles[i][j] = tile_types.tree
+                
     for r in rooms:
         # Clear out the room's inner area.
         dungeon.tiles[r.area] = tile_types.wall
@@ -179,7 +202,7 @@ def CA(
     				else:
     					new_map[i][j] = 1
 
-    return translate_CA(new_map, terrain), new_map    
+    return translate_CA(new_map, terrain) 
         
 def translate_CA(matrix, terrain):
     """Turns the generated terrain into a functional map"""

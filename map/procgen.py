@@ -11,7 +11,6 @@ from map.game_map import GameMap
 import random
 import tcod
 import entity_factories
-import numpy as np
 
 if TYPE_CHECKING:
     from entity import Entity
@@ -112,9 +111,9 @@ class RectangularRoom:
     @property #Returns two “slices”, which represent the inner portion of the room
     def sourindingd_area(self) -> Tuple[slice, slice]:
         """Return the inner area of this room as a 2D array index."""
-        arr = np.array=[self.x1-2, self.y1-2, self.x2+2, self.y2+2] 
-        arr[arr<0] = 0
-        return slice(arr[0], arr[2]), slice(arr[1], arr[3])
+        x1, y1 = self.x1-2, self.y1-2
+        x2, y2 = self.x2+2, self.y2+2         
+        return slice(x1, x2), slice(y1, y2)
     
     #Detects if two rooms overlap
     def intersects(self, other: RectangularRoom) -> bool:
