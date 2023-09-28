@@ -71,6 +71,76 @@ def generate_terrain(
                 terrain.tiles[i][j] = tile_types.tree
     return terrain, samples
 
+def locate_rooms(dungeon: GameMap,
+    max_rooms: int,
+    room_min_size: int,
+    room_max_size: int,
+    map_width: int,
+    map_height: int,
+    engine: Engine,
+    noise
+):
+    rooms: List[RectangularRoom] = []
+    player = dungeon.engine.player
+    while(len(rooms) < 3):
+        for r in range(max_rooms):
+            room_width = random.randint(room_min_size, room_max_size)
+            room_height = random.randint(room_min_size, room_max_size)
+    
+            x = random.randint(0, dungeon.width - room_width - 1)
+            y = random.randint(0, dungeon.height - room_height - 1)
+    
+            new_room = RectangularRoom(x, y, room_width, room_height)
+            # Run through the other rooms and see if they intersect with this one.
+            if any(new_room.intersects(other_room) for other_room in rooms):
+                continue  # This room intersects, so go to the next attempt.
+
+            mean = np.average(noise[new_room.area])
+            if mean > 0.1:
+                noise[new_room.sourindingd_area]*0.8
+                if len(rooms) == 0: # The first room, where the player starts.
+                    player.place(*new_room.center, dungeon)
+                rooms.append(new_room) # Append the new room to the list.
+        print(len(rooms))
+    return noise, rooms
+
+def set_rooms(
+    dungeon: GameMap,
+    max_rooms: int,
+    room_min_size: int,
+    room_max_size: int,
+    map_width: int,
+    map_height: int,
+    engine: Engine,
+    rooms: np.array,
+    noise
+) -> GameMap:
+    for r in rooms:
+        # Clear out the room's inner area.
+        dungeon.tiles[r.area] = tile_types.wall
+        if rooms[0] != r: # The first room, where the player starts.
+            place_entities(r, dungeon, engine.game_world.current_floor)
+        
+    """ Make a tunnel between this rooms"""
+    """
+    i = 0
+    while True:
+        if rooms[i] == rooms[-1]:
+            break
+        for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
+            dungeon.tiles[x, y] = tile_types.floor
+        i += 1
+        """
+    """Replaces the room's floor"""
+    for room in rooms:
+        dungeon.tiles[room.inner] = tile_types.room_floor
+    """Places the exit"""
+    center_of_last_room = rooms[-1].center
+    dungeon.tiles[center_of_last_room] = tile_types.down_stairs
+    dungeon.downstairs_location = center_of_last_room
+        
+    return dungeon
+
 def CA(
     map_width: int,
     map_height: int,

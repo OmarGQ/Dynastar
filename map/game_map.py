@@ -128,7 +128,7 @@ class GameWorld:
         self.complexity = 0.08
 
     def generate_floor(self) -> None:
-        from map.cavegen import generate_terrain, generate_rooms
+        from map.cavegen import generate_terrain, generate_rooms, locate_rooms
         
         self.current_floor += 1
         if self.complexity < 0.25:
@@ -142,7 +142,7 @@ class GameWorld:
             map_height = self.map_height,
             engine = self.engine,
             complexity = self.complexity,
-            version = version
+            version = "Simplex"
         )
         
         if version == "Dungeon":
@@ -151,7 +151,7 @@ class GameWorld:
             self.room_min_size = 9
             self.room_max_size = 13
             self.max_rooms = 3
-            
+        """    
         self.engine.game_map = generate_rooms(
             dungeon = self.engine.game_map,
             max_rooms = int(self.max_rooms * extra),
@@ -160,7 +160,19 @@ class GameWorld:
             map_width = self.map_width,
             map_height = self.map_height,
             engine = self.engine
+        )"""
+        dungeon, rooms= locate_rooms(
+            dungeon = self.engine.game_map,
+            max_rooms = int(self.max_rooms * extra),
+            room_min_size = int(self.room_min_size),
+            room_max_size = int(self.room_max_size * extra),
+            map_width = self.map_width,
+            map_height = self.map_height,
+            engine = self.engine,
+            noise = noise
         )
+        #print(dungeon)
+        #print(rooms)
         
 def get_size_values(
     weighted_chances_by_floor: List[Tuple[int, int, int, int]], floor: int
