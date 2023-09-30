@@ -12,7 +12,7 @@ import tcod
 import tile_types
 from typing import List, TYPE_CHECKING
 from map.game_map import GameMap
-from map.procgen import RectangularRoom, tunnel_between, place_entities
+from map.procgen import RectangularRoom, tunnel_between, place_entities_room, place_entities
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -50,7 +50,7 @@ def generate_terrain(
         )
         
     elif version == "Cave":
-        return generate_rooms_dungeon(
+        cave = generate_rooms_dungeon(
             dungeon = CA(map_width, map_height, terrain),
             max_rooms = max_rooms,
             room_min_size = room_min_size,
@@ -59,7 +59,8 @@ def generate_terrain(
             map_height = map_height,
             engine = engine
         )
-    
+        place_entities(cave, engine.game_world.current_floor, 2, 1)
+        return cave
     else:
         values = parameters[version]
         tile_v = values[4]
@@ -86,6 +87,7 @@ def generate_terrain(
     if(samples.all != samples1.all):
         print(True)
     terrain = set_rooms(terrain, map_width, map_height, engine, rooms, tile_v, samples1)
+    place_entities(terrain, engine.game_world.current_floor, 1, 3)
     return terrain
 
 def locate_rooms(dungeon: GameMap,
@@ -144,7 +146,7 @@ def set_rooms(
     for r in rooms:
         dungeon.tiles[r.area] = tile_types.wall
         if rooms[0] != r: # The first room, where the player starts.
-            place_entities(r, dungeon, engine.game_world.current_floor)
+            place_entities_room(r, dungeon, engine.game_world.current_floor)
         
     """Clear the path to get out and into the rooms"""
     i = 0
@@ -256,7 +258,7 @@ def generate_rooms_dungeon(
         if len(rooms) == 0: # The first room, where the player starts.
             player.place(*new_room.center, dungeon)
         else:  #Place enemies and items
-            place_entities(new_room, dungeon, engine.game_world.current_floor) 
+            place_entities_room(new_room, dungeon, engine.game_world.current_floor) 
         rooms.append(new_room) # Append the new room to the list.
         
     """ Make a tunnel between this rooms"""

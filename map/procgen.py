@@ -21,11 +21,16 @@ max_items_by_floor = [
     (4, 3),
 ]
 
-"""(Floor, Quantity)"""
 max_monsters_by_room = [
     (1, 3),
     (4, 4),
     (6, 5),
+]
+
+max_monsters_by_floor = [
+    (1, 6),
+    (4, 8),
+    (6, 12),
 ]
 
 """Floor: (Item, Probability)"""
@@ -125,7 +130,7 @@ class RectangularRoom:
             and self.y2 >= other.y1
         )
     
-def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) -> None:
+def place_entities_room(room: RectangularRoom, dungeon: GameMap, floor_number: int,) -> None:
     number_of_monsters = random.randint(
         0, get_max_value_for_floor(max_monsters_by_room, floor_number)
     )
@@ -141,6 +146,21 @@ def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int,) 
         y = random.randint(room.y1 + 1, room.y2 - 2)
 
         if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+            entity.spawn(dungeon, x, y)
+            
+def place_entities(dungeon: GameMap, floor_number: int, m, i) -> None:
+    number_of_monsters = get_max_value_for_floor(max_monsters_by_floor, floor_number)*m
+
+    number_of_items = get_max_value_for_floor(max_items_by_floor, floor_number)*i
+    
+    monsters: List[Entity] = get_entities_at_random(enemy_chances, number_of_monsters, floor_number)
+    items: List[Entity] = get_entities_at_random(item_chances, number_of_items, floor_number)
+    
+    for entity in monsters + items:
+        x = random.randint(0, dungeon.width - 1)
+        y = random.randint(0, dungeon.height - 1)
+
+        if not any(entity.x == x and entity.y == y for entity in dungeon.entities) and dungeon.tiles["walkable"][x, y]:
             entity.spawn(dungeon, x, y)
     
 def tunnel_between(
