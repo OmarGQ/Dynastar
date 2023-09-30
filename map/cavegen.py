@@ -39,7 +39,7 @@ def generate_terrain(
     terrain = GameMap(engine, map_width, map_height, entities=[player])
     
     if version == "Dungeon":
-        return generate_rooms(
+        return generate_rooms_dungeon(
             dungeon = terrain,
             max_rooms = max_rooms,
             room_min_size = room_min_size,
@@ -50,7 +50,7 @@ def generate_terrain(
         )
         
     elif version == "Cave":
-        return generate_rooms(
+        return generate_rooms_dungeon(
             dungeon = CA(map_width, map_height, terrain),
             max_rooms = max_rooms,
             room_min_size = room_min_size,
@@ -97,6 +97,7 @@ def locate_rooms(dungeon: GameMap,
     engine: Engine,
     noise
 ):
+    """Identify plane areas to set rooms"""
     rooms: List[RectangularRoom] = []
     player = dungeon.engine.player
     while(len(rooms) < 3):
@@ -114,6 +115,7 @@ def locate_rooms(dungeon: GameMap,
 
             mean = np.average(noise[new_room.area])
             if mean > 0.1:
+                #Reduce the value of adjacent tiles, increasing the posibility of open spaceses
                 noise[new_room.sourindingd_area] *= 0.6
                 if len(rooms) == 0: # The first room, where the player starts.
                     player.place(*new_room.center, dungeon)
@@ -129,6 +131,7 @@ def set_rooms(
     tiles,
     samples
 ) -> GameMap:
+    """Set tiles"""
     for i in range(map_width):
         for j in range(map_height):
             if samples[i][j]<tiles[0]:
@@ -137,24 +140,34 @@ def set_rooms(
                 dungeon.tiles[i][j] = tile_types.floor
             elif samples[i][j]<tiles[2]:
                 dungeon.tiles[i][j] = tile_types.tree
-                
+    """Set rooms"""
     for r in rooms:
-        # Clear out the room's inner area.
         dungeon.tiles[r.area] = tile_types.wall
         if rooms[0] != r: # The first room, where the player starts.
             place_entities(r, dungeon, engine.game_world.current_floor)
         
-    """ Make a tunnel between this rooms"""
-    """
+    """Clear the path to get out and into the rooms"""
     i = 0
     while True:
+        clear = 0
         if rooms[i] == rooms[-1]:
+            for x, y in tunnel_between(rooms[i].center, rooms[i-1].center):
+                if clear == 7:
+                    break
+                if dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree:
+                    dungeon.tiles[x, y] = tile_types.floor
+                else:
+                    clear += 1
             break
         for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
-            dungeon.tiles[x, y] = tile_types.floor
+            if clear == 7:
+                break
+            if dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree:
+                dungeon.tiles[x, y] = tile_types.floor
+            else:
+                clear += 1
         i += 1
-        """
-    """Replaces the room's floor"""
+        
     for room in rooms:
         dungeon.tiles[room.inner] = tile_types.room_floor
     """Places the exit"""
@@ -205,7 +218,7 @@ def CA(
     return translate_CA(new_map, terrain) 
         
 def translate_CA(matrix, terrain):
-    """Turns the generated terrain into a functional map"""
+    """Turns the generated CA terrain into a functional map"""
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
             if matrix[i][j] == 0:
@@ -214,7 +227,7 @@ def translate_CA(matrix, terrain):
                 terrain.tiles[i][j] = tile_types.floor
     return terrain
 
-def generate_rooms(
+def generate_rooms_dungeon(
     dungeon: GameMap,
     max_rooms: int,
     room_min_size: int,
@@ -223,7 +236,7 @@ def generate_rooms(
     map_height: int,
     engine: Engine,
 ) -> GameMap:
-    """Generate a new dungeon map."""
+    """Generate rooms for a dungeon"""
     rooms: List[RectangularRoom] = []
     center_of_last_room = (0, 0)
     player = dungeon.engine.player
@@ -239,7 +252,6 @@ def generate_rooms(
         if any(new_room.intersects(other_room) for other_room in rooms):
             continue  # This room intersects, so go to the next attempt.
 
-        # Clear out the room's inner area.
         dungeon.tiles[new_room.area] = tile_types.wall
         if len(rooms) == 0: # The first room, where the player starts.
             player.place(*new_room.center, dungeon)
