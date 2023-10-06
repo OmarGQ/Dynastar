@@ -128,7 +128,7 @@ class GameWorld:
         self.complexity = 0.08
 
     def generate_floor(self) -> None:
-        from map.cavegen import generate_terrain
+        from map.levelgen import generate_terrain
         
         self.current_floor += 1
         if self.complexity < 0.25:

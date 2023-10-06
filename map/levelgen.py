@@ -50,17 +50,13 @@ def generate_terrain(
         )
         
     elif version == "Cave":
-        cave = generate_rooms_dungeon(
-            dungeon = CA(map_width, map_height, terrain),
-            max_rooms = max_rooms,
-            room_min_size = room_min_size,
-            room_max_size = room_max_size,
-            map_width = map_width,
-            map_height = map_height,
-            engine = engine
-        )
-        place_entities(cave, engine.game_world.current_floor, 2, 1)
+        sample = CA(map_width, map_height)
+        sample, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, sample)
+        cave = translate_CA(sample, terrain)
+        cave = set_rooms(terrain, rooms)
+        place_entities(cave, engine.game_world.current_floor, 5, 2)
         return cave
+       
     else:
         values = parameters[version]
         tile_v = values[4]
@@ -84,9 +80,8 @@ def generate_terrain(
     """Return the sampled noise from this grid of points"""
     samples = noise.sample_ogrid(ogrid)
     samples1, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, samples)
-    if(samples.all != samples1.all):
-        print(True)
-    terrain = set_rooms(terrain, map_width, map_height, engine, rooms, tile_v, samples1)
+    terrain = Set_tiles(terrain, map_width, map_height, tile_v, samples1)
+    terrain = set_rooms(terrain, rooms)
     place_entities(terrain, engine.game_world.current_floor, 1, 3)
     return terrain
 
@@ -124,15 +119,12 @@ def locate_rooms(dungeon: GameMap,
                 rooms.append(new_room) # Append the new room to the list.
     return noise, rooms
 
-def set_rooms(
+def Set_tiles(
     dungeon: GameMap,
     map_width: int,
     map_height: int,
-    engine: Engine,
-    rooms: np.array,
     tiles,
-    samples
-) -> GameMap:
+    samples) -> GameMap:
     """Set tiles"""
     for i in range(map_width):
         for j in range(map_height):
@@ -142,11 +134,17 @@ def set_rooms(
                 dungeon.tiles[i][j] = tile_types.floor
             elif samples[i][j]<tiles[2]:
                 dungeon.tiles[i][j] = tile_types.tree
+    return dungeon
+    
+def set_rooms(
+    dungeon: GameMap,
+    rooms: np.array
+) -> GameMap:
     """Set rooms"""
     for r in rooms:
         dungeon.tiles[r.area] = tile_types.wall
         if rooms[0] != r: # The first room, where the player starts.
-            place_entities_room(r, dungeon, engine.game_world.current_floor)
+            place_entities_room(r, dungeon, dungeon.engine.game_world.current_floor)
         
     """Clear the path to get out and into the rooms"""
     i = 0
@@ -181,43 +179,41 @@ def set_rooms(
 
 def CA(
     map_width: int,
-    map_height: int,
-    terrain: GameMap
+    map_height: int
 ):
     fill_prob = 0.4  
     """Generate initial random map"""
     shape = (map_width, map_height)
-    new_map = np.ones(shape)
+    sample = np.ones(shape)
     for i in range(shape[0]):
     	for j in range(shape[1]):
     		choice = random.uniform(0, 1)
-    		new_map[i][j] = 0 if choice < fill_prob else 1
+    		sample[i][j] = 0 if choice < fill_prob else 1
 
     """run for 6 generations"""
     generations = 6
     for generation in range(generations):
     	for i in range(shape[0]):
     		for j in range(shape[1]): # Count walls around the cell
-    			submap = new_map[max(i-1, 0):min(i+2, new_map.shape[0]),max(j-1, 0):min(j+2, new_map.shape[1])]
+    			submap = sample[max(i-1, 0):min(i+2, sample.shape[0]),max(j-1, 0):min(j+2, sample.shape[1])]
     			wallcount_1away = len(np.where(submap.flatten() == 0)[0])
-    			submap = new_map[max(i-2, 0):min(i+3, new_map.shape[0]),max(j-2, 0):min(j+3, new_map.shape[1])]
+    			submap = sample[max(i-2, 0):min(i+3, sample.shape[0]),max(j-2, 0):min(j+3, sample.shape[1])]
     			wallcount_2away = len(np.where(submap.flatten() == 0)[0])
     			"""for first five generations build a scaffolding of walls"""
     			if generation < 5:
     				if wallcount_1away >= 5 or wallcount_2away <= 7:
-    					new_map[i][j] = 0
+    					sample[i][j] = 0
     				else:
-    					new_map[i][j] = 1
+    					sample[i][j] = 1
     				if i==0 or j == 0 or i == shape[0]-1 or j == shape[1]-1:
-    					new_map[i][j] = 0 
+    					sample[i][j] = 0 
     			else:
     				"""For the last generation generate openings"""
     				if wallcount_1away >= 5:
-    					new_map[i][j] = 0
+    					sample[i][j] = 0
     				else:
-    					new_map[i][j] = 1
-
-    return translate_CA(new_map, terrain) 
+    					sample[i][j] = 1
+    return sample
         
 def translate_CA(matrix, terrain):
     """Turns the generated CA terrain into a functional map"""
