@@ -77,11 +77,15 @@ def generate_terrain(
     ogrid[0] *= complexity
     ogrid[1] *= complexity
 
-    """Return the sampled noise from this grid of points"""
+    """Sample noise from this grid of points"""
     samples = noise.sample_ogrid(ogrid)
+    """Allocate rooms"""
     samples1, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, samples)
+    """Set tiles"""
     terrain = Set_tiles(terrain, map_width, map_height, tile_v, samples1)
+    """Set and populate rooms"""
     terrain = set_rooms(terrain, rooms)
+    """Populate gamemap"""
     place_entities(terrain, engine.game_world.current_floor, 1, 3)
     return terrain
 
@@ -111,7 +115,7 @@ def locate_rooms(dungeon: GameMap,
                 continue  # This room intersects, so go to the next attempt.
 
             mean = np.average(noise[new_room.area])
-            if mean > 0.1:
+            if mean > 0.1 and mean < 0.7:
                 #Reduce the value of adjacent tiles, increasing the posibility of open spaceses
                 noise[new_room.sourindingd_area] *= 0.6
                 if len(rooms) == 0: # The first room, where the player starts.

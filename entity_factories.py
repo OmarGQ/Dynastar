@@ -15,7 +15,7 @@ from components.equipment import Equipment
 
 player = Actor(
     char="@",
-    color=(0, 255, 255),
+    color=(255, 0, 0),
     name="Player",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
