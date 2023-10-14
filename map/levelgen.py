@@ -123,7 +123,34 @@ def locate_rooms(dungeon: GameMap,
                 if len(rooms) == 0: # The first room, where the player starts.
                     player.place(*new_room.center, dungeon)
                 rooms.append(new_room) # Append the new room to the list.
+    #noise = path_generation(dungeon, rooms, noise)
     return noise, rooms
+
+def path_generation(dungeon: GameMap, rooms: np.array, noise):
+    i = 0
+    while True:
+        clear = 0
+        flag = False
+        #for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
+        for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
+            if clear == 4 and flag == True:
+                break
+            if noise[x, y] != 2:
+                #noise[x, y] = 0
+                flag = True
+            if (noise[x, y] > 0.4 or noise[x, y] < 1) and flag == True:
+                for n in range(-1, 2):
+                    for m in range(-1, 2):
+                        if noise[x+n, y+m] < 1:
+                            noise[x+n, y+m] *= 0.8
+                noise[x, y] = 0
+                clear = 0
+            else:
+                clear += 1
+        if rooms[i] == rooms[-1]:
+            break
+        i += 1
+    return noise
 
 def Set_tiles(
     dungeon: GameMap,
@@ -157,6 +184,7 @@ def set_rooms(
     i = 0
     while True:
         clear = 0
+        flag = False
         if rooms[i] == rooms[-1]:
             #for x, y in tunnel_between(rooms[i].center, rooms[i-1].center):
             for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
@@ -171,9 +199,12 @@ def set_rooms(
         for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
             if clear == 8:
                 break
-            if dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree:
+            if dungeon.tiles[x, y] == tile_types.wall:
+                flag = True
+            if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree) and flag == True:
                 #[dungeon.tiles[x-1, y-1], dungeon.tiles[x, y-1], dungeon.tiles[x+1, y-1], dungeon.tiles[x-1, y], dungeon.tiles[x+1, y], dungeon.tiles[x-1, y+1], dungeon.tiles[x, y+1], dungeon.tiles[x+1, y+1]]
                 dungeon.tiles[x, y] = tile_types.floor
+                clear = 0
             else:
                 clear += 1
         i += 1
