@@ -10,6 +10,7 @@ from typing import Dict, List, Iterator, Tuple, TYPE_CHECKING
 from map.game_map import GameMap
 import random
 import tcod
+import tile_types
 import entity_factories
 
 if TYPE_CHECKING:
@@ -115,7 +116,7 @@ class RectangularRoom:
     
     @property #Returns two “slices”, which represent the inner portion of the room
     def sourindingd_area(self) -> Tuple[slice, slice]:
-        """Return the inner area of this room as a 2D array index."""
+        """Return the sourindingd area of this room as a 2D array index."""
         x1, y1 = self.x1-2, self.y1-2
         x2, y2 = self.x2+2, self.y2+2         
         return slice(x1, x2), slice(y1, y2)
@@ -124,10 +125,10 @@ class RectangularRoom:
     def intersects(self, other: RectangularRoom) -> bool:
         """Return True if this room overlaps with another RectangularRoom."""
         return (
-            self.x1 <= other.x2
-            and self.x2 >= other.x1
-            and self.y1 <= other.y2
-            and self.y2 >= other.y1
+            self.x1 <= other.x2+2
+            and self.x2 >= other.x1-2
+            and self.y1 <= other.y2+2
+            and self.y2 >= other.y1-2
         )
     
 def place_entities_room(room: RectangularRoom, dungeon: GameMap, floor_number: int,) -> None:
@@ -156,7 +157,13 @@ def place_entities(dungeon: GameMap, floor_number: int, m, i) -> None:
     monsters: List[Entity] = get_entities_at_random(enemy_chances, number_of_monsters, floor_number)
     items: List[Entity] = get_entities_at_random(item_chances, number_of_items, floor_number)
     
-    for entity in monsters + items:
+    for entity in monsters:
+        x = random.randint(0, dungeon.width - 1)
+        y = random.randint(0, dungeon.height - 1)
+
+        if not any(entity.x == x and entity.y == y for entity in dungeon.entities) and dungeon.tiles["walkable"][x, y] and dungeon.tiles[x, y] != tile_types.room_floor:
+            entity.spawn(dungeon, x, y)
+    for entity in items:
         x = random.randint(0, dungeon.width - 1)
         y = random.randint(0, dungeon.height - 1)
 

@@ -115,10 +115,10 @@ def locate_rooms(dungeon: GameMap,
                 continue  # This room intersects, so go to the next attempt.
 
             mean = np.average(noise[new_room.area])
-            if mean > 0.1 and mean < 0.7:
+            if mean > 0.1 and mean < 0.6:
                 #Reduce the value of adjacent tiles, increasing the posibility of open spaceses
-                noise[new_room.sourindingd_area] *= 0.6
-                noise[new_room.area] = 1.1
+                noise[new_room.sourindingd_area] *= 0.7
+                noise[new_room.area] = 3
                 noise[new_room.inner] = 2
                 if len(rooms) == 0: # The first room, where the player starts.
                     player.place(*new_room.center, dungeon)
@@ -167,6 +167,8 @@ def Set_tiles(
                 dungeon.tiles[i][j] = tile_types.floor
             elif samples[i][j]<tiles[2]:
                 dungeon.tiles[i][j] = tile_types.tree
+            elif samples[i][j]==3:
+                dungeon.tiles[i][j] = tile_types.room_wall
             elif samples[i][j]==2:
                 dungeon.tiles[i][j] = tile_types.room_floor
     return dungeon
@@ -184,29 +186,41 @@ def set_rooms(
     i = 0
     while True:
         clear = 0
+        distance = 0
         flag = False
-        if rooms[i] == rooms[-1]:
-            #for x, y in tunnel_between(rooms[i].center, rooms[i-1].center):
-            for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
-                if clear == 8:
-                    break
-                if dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree:
-                    dungeon.tiles[x, y] = tile_types.floor
-                else:
-                    clear += 1
-            break
         #for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
         for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
-            if clear == 8:
+            if clear == 7:
                 break
-            if dungeon.tiles[x, y] == tile_types.wall:
+            if dungeon.tiles[x, y] == tile_types.room_wall and flag == False:
+                dungeon.tiles[x, y] = tile_types.floor
                 flag = True
             if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree) and flag == True:
-                #[dungeon.tiles[x-1, y-1], dungeon.tiles[x, y-1], dungeon.tiles[x+1, y-1], dungeon.tiles[x-1, y], dungeon.tiles[x+1, y], dungeon.tiles[x-1, y+1], dungeon.tiles[x, y+1], dungeon.tiles[x+1, y+1]]
                 dungeon.tiles[x, y] = tile_types.floor
+                distance += 1
                 clear = 0
-            else:
+            elif flag == True:
                 clear += 1
+                distance += 1
+                
+        if flag == False or distance < 10:
+            if rooms[i] != rooms[-1]:
+                next_room = rooms[-1]
+            else:
+                next_room = rooms[0]
+            for x, y in tunnel_between(rooms[i].center, next_room.center):
+                if clear == 7:
+                    break
+                if dungeon.tiles[x, y] == tile_types.room_wall:
+                    dungeon.tiles[x, y] = tile_types.floor
+                    flag = True
+                if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree) and flag == True:
+                    dungeon.tiles[x, y] = tile_types.floor
+                    clear = 0
+                else:
+                    clear += 1
+        if rooms[i] == rooms[-1]:
+            break
         i += 1
         
     """Places the exit"""
@@ -262,6 +276,8 @@ def translate_CA(matrix, terrain):
                 terrain.tiles[i][j] = tile_types.wall
             elif matrix[i][j] == 2:
                 terrain.tiles[i][j] = tile_types.room_floor
+            elif matrix[i][j] == 3:
+                terrain.tiles[i][j] = tile_types.room_wall
             else:
                 terrain.tiles[i][j] = tile_types.floor
     return terrain
