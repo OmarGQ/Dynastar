@@ -191,69 +191,66 @@ def set_rooms(
         flag = False
         room = rooms[i]
         center = room.center
-        
-        if room.x1 < midX:
-            if room.y1 < midY: #Top left
+
+        if center[1] < midY:
+            if center[0] < midX: #Top left
                 if dungeon.tiles[center[0], room.y2+1] == tile_types.floor:
-                    door = [center[0], room.y2] #bottom
-                    start = [center[0], room.y2+1] #bottom
+                    door = (center[0], room.y2-1) #bottom
+                    start = (center[0], room.y2) #bottom
                 else:
-                    door = [room.x2, center[1]] #right
-                    start = [room.x2+1, center[1]] #right
+                    door = (room.x2-1, center[1]) #right
+                    start = (room.x2, center[1]) #right
             else: #Top right
                 if dungeon.tiles[center[0], room.y2+1] == tile_types.floor:
-                    door = [center[0], room.y2] #bottom
-                    start = [center[0], room.y2+1]
+                    door = (center[0], room.y2-1) #bottom
+                    start = (center[0], room.y2)
                 else:
-                    door = [room.x1, center[1]] #left
-                    start = [room.x1-1, center[1]] #left             
+                    door = (room.x1, center[1]) #left
+                    start = (room.x1-1, center[1]) #left      
         else:
-            if room.y1 < midY:  #Bottom left
+            if center[0] < midX:  #Bottom left
                 if dungeon.tiles[center[0], room.y1-1] == tile_types.floor:
-                    door = [center[0], room.y1] #top
-                    start = [center[0], room.y1-1] #top
+                    door = (center[0], room.y1) #top
+                    start = (center[0], room.y1-1) #top
                 else:
-                    door = [room.x2, center[1]] #right
-                    start = [room.x2+1, center[1]] #right
+                    door = (room.x2-1, center[1]) #right
+                    start = (room.x2, center[1]) #right
             else: #Bottom right
                 if dungeon.tiles[center[0], room.y1-1] == tile_types.floor:
-                    door = [center[0], room.y1] #top
-                    start = [center[0], room.y1-1] #top
+                    door = (center[0], room.y1) #top
+                    start = (center[0], room.y1-1) #top
                 else:
-                    door = [room.x1, center[1]] #left
-                    start = [room.x1-1, center[1]] #left
+                    door = (room.x1, center[1]) #left
+                    start = (room.x1-1, center[1]) #left
 
         #for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
-        for x, y in tunnel_between(center, [midX, midY]):
+        for x, y in tunnel_between(start, [midX, midY]):
             if clear == 7:
                 break
-            if dungeon.tiles[x, y] == tile_types.room_wall and flag == False:
+            if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree):
                 dungeon.tiles[x, y] = tile_types.floor
-                flag = True
-            if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree) and flag == True:
-                dungeon.tiles[x, y] = tile_types.floor
-                distance += 1
                 clear = 0
-            elif flag == True:
-                clear += 1
-                distance += 1
-                
-        if flag == False or distance < 20:
+            clear += 1
+            distance += 1
+        dungeon.tiles[door] = tile_types.floor
+        if distance < 15 or random.random() < 0.3:
+            clear = 0
             if room != rooms[-1]:
                 next_room = rooms[-1]
             else:
                 next_room = rooms[0]
             for x, y in tunnel_between(center, next_room.center):
-                if clear == 7:
+                if clear == 5:
                     break
-                if dungeon.tiles[x, y] == tile_types.room_wall:
+                if dungeon.tiles[x, y] == tile_types.room_wall and flag == False:
                     dungeon.tiles[x, y] = tile_types.floor
                     flag = True
-                if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree) and flag == True:
+                if (dungeon.tiles[x, y] == tile_types.wall or dungeon.tiles[x, y] == tile_types.tree):
                     dungeon.tiles[x, y] = tile_types.floor
                     clear = 0
                 else:
                     clear += 1
+
         if room == rooms[-1]:
             break
         i += 1
