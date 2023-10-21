@@ -203,7 +203,7 @@ def set_rooms(
                 clear += 1
                 distance += 1
                 
-        if flag == False or distance < 10:
+        if flag == False or distance < 20:
             if rooms[i] != rooms[-1]:
                 next_room = rooms[-1]
             else:
