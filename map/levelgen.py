@@ -131,7 +131,6 @@ def path_generation(dungeon: GameMap, rooms: np.array, noise):
     while True:
         clear = 0
         flag = False
-        #for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
         for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
             if clear == 4 and flag == True:
                 break
@@ -184,12 +183,48 @@ def set_rooms(
         
     """Clear the path to get out and into the rooms"""
     i = 0
+    midX = int(dungeon.width/2)
+    midY = int(dungeon.height/2)
     while True:
         clear = 0
         distance = 0
         flag = False
+        room = rooms[i]
+        center = room.center
+        
+        if room.x1 < midX:
+            if room.y1 < midY: #Top left
+                if dungeon.tiles[center[0], room.y2+1] == tile_types.floor:
+                    door = [center[0], room.y2] #bottom
+                    start = [center[0], room.y2+1] #bottom
+                else:
+                    door = [room.x2, center[1]] #right
+                    start = [room.x2+1, center[1]] #right
+            else: #Top right
+                if dungeon.tiles[center[0], room.y2+1] == tile_types.floor:
+                    door = [center[0], room.y2] #bottom
+                    start = [center[0], room.y2+1]
+                else:
+                    door = [room.x1, center[1]] #left
+                    start = [room.x1-1, center[1]] #left             
+        else:
+            if room.y1 < midY:  #Bottom left
+                if dungeon.tiles[center[0], room.y1-1] == tile_types.floor:
+                    door = [center[0], room.y1] #top
+                    start = [center[0], room.y1-1] #top
+                else:
+                    door = [room.x2, center[1]] #right
+                    start = [room.x2+1, center[1]] #right
+            else: #Bottom right
+                if dungeon.tiles[center[0], room.y1-1] == tile_types.floor:
+                    door = [center[0], room.y1] #top
+                    start = [center[0], room.y1-1] #top
+                else:
+                    door = [room.x1, center[1]] #left
+                    start = [room.x1-1, center[1]] #left
+
         #for x, y in tunnel_between(rooms[i].center, rooms[i+1].center):
-        for x, y in tunnel_between(rooms[i].center, [int(dungeon.width/2), int(dungeon.height/2)]):
+        for x, y in tunnel_between(center, [midX, midY]):
             if clear == 7:
                 break
             if dungeon.tiles[x, y] == tile_types.room_wall and flag == False:
@@ -204,11 +239,11 @@ def set_rooms(
                 distance += 1
                 
         if flag == False or distance < 20:
-            if rooms[i] != rooms[-1]:
+            if room != rooms[-1]:
                 next_room = rooms[-1]
             else:
                 next_room = rooms[0]
-            for x, y in tunnel_between(rooms[i].center, next_room.center):
+            for x, y in tunnel_between(center, next_room.center):
                 if clear == 7:
                     break
                 if dungeon.tiles[x, y] == tile_types.room_wall:
@@ -219,7 +254,7 @@ def set_rooms(
                     clear = 0
                 else:
                     clear += 1
-        if rooms[i] == rooms[-1]:
+        if room == rooms[-1]:
             break
         i += 1
         
