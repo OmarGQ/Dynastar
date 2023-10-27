@@ -48,10 +48,10 @@ def generate_terrain(
             map_height = map_height,
             engine = engine
         )
-        
     elif version == "Cave":
         sample = CA(map_width, map_height)
         sample, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, sample)
+        sample = path_generation(terrain, rooms, sample, [1,-0.5])
         cave = translate_CA(sample, terrain)
         cave = populate_rooms(terrain, rooms)
         place_entities(cave, engine.game_world.current_floor, 5, 2)
@@ -82,7 +82,7 @@ def generate_terrain(
     """Allocate rooms"""
     samples, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, samples)
     """Generate paths"""
-    samples = path_generation(terrain, rooms, samples, tile_v)
+    samples = path_generation(terrain, rooms, samples, [0, tile_v[1]])
     """Set tiles"""
     terrain = Set_tiles(terrain, map_width, map_height, tile_v, samples)
     """Set and populate rooms"""
@@ -143,12 +143,16 @@ def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles):
             if clear == 7:
                 break
             if (noise[x, y] > tiles[1] and noise[x, y] < 1.1):
-                noise[x, y] = 0
+                noise[x, y] = tiles[0]
+                for j in range(-1, 2):
+                    for k in range(-1, 2):
+                        if noise[x+j, y+k] != 3 and noise[x+j, y+k] != 2:
+                            noise[x+j, y+k] *= 0.5
                 clear = 0
             clear += 1
             distance += 1
-        noise[door] = 0
-        
+        noise[door] = tiles[0]
+
         if distance < 15 or random.random() < 0.3:
             clear = 0
             door, start = Select_direction(dungeon, room, noise, True)
@@ -156,11 +160,15 @@ def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles):
                 if clear == 7:
                     break
                 if (noise[x, y] > tiles[1] and noise[x, y] < 1.1):
-                    noise[x, y] = 0
+                    noise[x, y] = tiles[0]
+                    for j in range(-1, 2):
+                        for k in range(-1, 2):
+                            if noise[x+j, y+k] != 3 and noise[x+j, y+k] != 2:
+                                noise[x+j, y+k] *= 0.5
                     clear = 0
                 clear += 1
                 distance += 1
-            noise[door] = 0
+            noise[door] = tiles[0]
 
         if room == rooms[-1]:
             break
@@ -232,7 +240,6 @@ def populate_rooms(
     for r in rooms:
         if rooms[0] != r: # The first room, where the player starts.
             place_entities_room(r, dungeon, dungeon.engine.game_world.current_floor)
-
     """Places the exit"""
     center_of_last_room = rooms[-1].center
     dungeon.tiles[center_of_last_room] = tile_types.down_stairs
