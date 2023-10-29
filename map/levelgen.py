@@ -19,8 +19,8 @@ if TYPE_CHECKING:
 
 #algorithm, implementation, lacunarity, octaves, map values
 parameters = {
-    "Simplex": [2, tcod.noise.Implementation.SIMPLE, 8, 8, [-0.7, 0.2, 0.5]],
-    "Perlin":  [1, tcod.noise.Implementation.FBM, 3, 4, [-0.3, 0.1, 0.3]],
+    "Simplex": [2, tcod.noise.Implementation.SIMPLE, 8, 8, [-0.8, 0.2, 0.5]],
+    "Perlin":  [1, tcod.noise.Implementation.FBM, 3, 4, [-0.47, 0.1, 0.3]],
     "Wavelet": [4, tcod.noise.Implementation.TURBULENCE, 3, 2, [-1, 0.4, 0.7]]
     }
 

@@ -125,7 +125,7 @@ class GameWorld:
         self.room_max_size = 0
 
         self.current_floor = current_floor
-        self.complexity = 0.08
+        self.complexity = 0.10
 
     def generate_floor(self) -> None:
         from map.levelgen import generate_terrain
