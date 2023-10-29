@@ -51,7 +51,8 @@ def generate_terrain(
     elif version == "Cave":
         sample = CA(map_width, map_height)
         sample, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, sample)
-        sample = path_generation(terrain, rooms, sample, [1,-0.5])
+        lis = rooms.copy()
+        sample = path_generation_new(terrain, lis, sample, [1,-0.5])
         cave = translate_CA(sample, terrain)
         cave = populate_rooms(terrain, rooms)
         place_entities(cave, engine.game_world.current_floor, 5, 2)
@@ -82,7 +83,8 @@ def generate_terrain(
     """Allocate rooms"""
     samples, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, samples)
     """Generate paths"""
-    samples = path_generation(terrain, rooms, samples, [0, tile_v[1]])
+    lis = rooms.copy()
+    samples = path_generation_new(terrain, lis, samples, [0, tile_v[1]])
     """Set tiles"""
     terrain = Set_tiles(terrain, map_width, map_height, tile_v, samples)
     """Set and populate rooms"""
@@ -127,6 +129,34 @@ def locate_rooms(dungeon: GameMap,
                 rooms.append(new_room) # Append the new room to the list.
     return noise, rooms
 
+def path_generation_new(dungeon: GameMap, rooms: np.array, noise, tiles, flag=False):
+    """Clear the path to get out and into the rooms"""
+    midX = int(dungeon.width/2)
+    midY = int(dungeon.height/2)
+    clear = 0
+    distance = 0
+    room = rooms.pop(0)
+    door, start = Select_direction(dungeon, room, noise, flag)
+    for x, y in tunnel_between(start, [midX, midY]):
+        if clear == 7:
+            break
+        if (noise[x, y] > tiles[1] and noise[x, y] < 1.1):
+            noise[x, y] = tiles[0]
+            for j in range(-1, 2):
+                for k in range(-1, 2):
+                    if noise[x+j, y+k] != 3 and noise[x+j, y+k] != 2:
+                        noise[x+j, y+k] *= 0.7
+            clear = 0
+        clear += 1
+        distance += 1
+    noise[door] = tiles[0]
+    if (distance < 15 or random.random() < 0.3) and flag == False:
+        noise = path_generation_new(dungeon, [room], noise, tiles, True)
+    if len(rooms) == 0:
+        return noise
+    else:
+        return path_generation_new(dungeon, rooms, noise, tiles, True)
+        
 def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles):
     """Clear the path to get out and into the rooms"""
     i = 0
