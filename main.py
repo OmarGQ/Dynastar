@@ -43,7 +43,8 @@ def main() -> None:
                 handler.on_render(console=root_console)
                 context.present(root_console)
                 #Full screen
-                #context.sdl_window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
+                #
+                context.sdl_window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
                 
                 try:
                     for event in tcod.event.wait():
