@@ -138,7 +138,7 @@ class GameWorld:
         version = random.choice(generation)
         
         if version == "Dungeon":
-            extra = 1.8
+            extra = 1.5
         elif version == "Cave":
             self.room_min_size = 9
             self.room_max_size = 13

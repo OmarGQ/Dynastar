@@ -52,7 +52,7 @@ def generate_terrain(
         sample = CA(map_width, map_height)
         sample, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, sample)
         lis = rooms.copy()
-        sample = path_generation(terrain, lis, sample, [1,-0.5])
+        sample = path_generation(terrain, lis, sample, [1, -0.5, 5])
         cave = translate_CA(sample, terrain)
         cave = populate_rooms(terrain, rooms)
         place_entities(cave, engine.game_world.current_floor, 5, 2)
@@ -84,7 +84,7 @@ def generate_terrain(
     samples, rooms = locate_rooms(terrain, max_rooms, room_min_size, room_max_size, map_width, map_height, engine, samples)
     """Generate paths"""
     lis = rooms.copy()
-    samples = path_generation(terrain, lis, samples, [0, tile_v[1]])
+    samples = path_generation(terrain, lis, samples, [0, tile_v[1], 7])
     """Set tiles"""
     terrain = Set_tiles(terrain, map_width, map_height, tile_v, samples)
     """Set and populate rooms"""
@@ -137,9 +137,9 @@ def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles, flag = Fals
     distance = 0
     room = rooms.pop(0)
     if door == None and start == None:
-        door, start, d2, s2 = Select_direction2(dungeon, room, noise)
+        door, start, d2, s2 = Select_direction(dungeon, room, noise)
     for x, y in tunnel_between(start, [midX, midY]):
-        if clear == 7:
+        if clear == tiles[2]:
             break
         if (noise[x, y] > tiles[1] and noise[x, y] < 1.1):
             noise[x, y] = tiles[0]
@@ -162,58 +162,6 @@ def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles, flag = Fals
         return path_generation(dungeon, rooms, noise, tiles, True)
 
 def Select_direction(dungeon: GameMap, room, noise):
-    midX = int(dungeon.width/2)
-    midY = int(dungeon.height/2)
-    center = room.center
-    if center[1] < midY:
-        if center[0] < midX : #Top left
-            if noise[center[0], room.y2+1] < 0.4:
-                door = (center[0], room.y2-1) #bottom
-                start = (center[0], room.y2) #bottom
-                door2 = (room.x2-1, center[1]) #right
-                start2 = (room.x2, center[1]) #right
-            else:
-                door = (room.x2-1, center[1]) #right
-                start = (room.x2, center[1]) #right
-                door2 = (center[0], room.y2-1) #bottom
-                start2 = (center[0], room.y2) #bottom
-        else: #Top right
-            if noise[center[0], room.y2+1] < 0.4:
-                door = (center[0], room.y2-1) #bottom
-                start = (center[0], room.y2)
-                door2 = (room.x1, center[1]) #left
-                start2 = (room.x1-1, center[1]) #left
-            else:
-                door = (room.x1, center[1]) #left
-                start = (room.x1-1, center[1]) #left
-                door2 = (center[0], room.y2-1) #bottom
-                start2 = (center[0], room.y2)
-    else:
-        if center[0] < midX:  #Bottom left
-            if noise[center[0], room.y1-1] < 0.4:
-                door = (center[0], room.y1) #top
-                start = (center[0], room.y1-1) #top
-                door2 = (room.x2-1, center[1]) #right
-                start2 = (room.x2, center[1]) #right
-            else:
-                door = (room.x2-1, center[1]) #right
-                start = (room.x2, center[1]) #right
-                door2 = (center[0], room.y1) #top
-                start2 = (center[0], room.y1-1) #top
-        else: #Bottom right
-            if noise[center[0], room.y1-1] < 0.4:
-                door = (center[0], room.y1) #top
-                start = (center[0], room.y1-1) #top
-                door2 = (room.x1, center[1]) #left
-                start2 = (room.x1-1, center[1]) #left
-            else:
-                door = (room.x1, center[1]) #left
-                start = (room.x1-1, center[1]) #left
-                door2 = (center[0], room.y1) #top
-                start2 = (center[0], room.y1-1) #top
-    return door, start, door2, start2
-
-def Select_direction2(dungeon: GameMap, room, noise):
     thirdX = int(dungeon.width/3)
     thirdY = int(dungeon.height/3)
     center = room.center

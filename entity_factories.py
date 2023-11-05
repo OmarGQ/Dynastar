@@ -15,7 +15,7 @@ from components.equipment import Equipment
 
 player = Actor(
     char="@",
-    color=(255, 0, 0),
+    color=(153, 0, 0),
     name="Player",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
@@ -136,68 +136,76 @@ super_troll = Actor(
 
 
 health_potion = Item(
-    char="!",
-    color=(127, 0, 255),
+    char="►",
+    color=(160, 160, 160),
     name="Health Potion",
     consumable=consumable.HealingConsumable(amount=6),
 )
 
 health_potion_Lv2 = Item(
-    char="!",
-    color=(147, 0, 255),
+    char="►",
+    color=(160, 160, 160),
     name="Health Potion",
     consumable=consumable.HealingConsumable(amount=12),
 )
 
 lightning_scroll = Item(
     char="~",
-    color=(255, 255, 0),
+    color=(104, 104, 0),
     name="Lightning Scroll",
     consumable=consumable.LightningDamageConsumable(damage=20, maximum_range=5),
 )
 
 confusion_scroll = Item(
     char="~",
-    color=(207, 63, 255),
+    color=(104, 104, 0),
     name="Confusion Scroll",
     consumable=consumable.ConfusionConsumable(number_of_turns=10),
 )
 
 fireball_scroll = Item(
     char="~",
-    color=(255, 0, 0),
+    color=(104, 104, 0),
     name="Fireball Scroll",
     consumable=consumable.FireballDamageConsumable(damage=12, radius=3),
 )
 
-dagger = Item(char="/", color=(0, 191, 255), name="Dagger", equippable=equippable.Dagger())
+dagger = Item(
+    char="○", color=(160, 160, 160), name="Dagger", equippable=equippable.Dagger()
+    )
 
-sword = Item(char="/", color=(0, 191, 255), name="Sword", equippable=equippable.Sword())
+sword = Item(
+    char="○", color=(160, 160, 160), name="Sword", equippable=equippable.Sword()
+    )
 
-axe = Item(char="/", color=(0, 191, 255), name="Axe", equippable=equippable.Axe())
+axe = Item(
+    char="○", color=(160, 160, 160), name="Axe", equippable=equippable.Axe()
+    )
 
-mace = Item(char="/", color=(0, 191, 255), name="Mace", equippable=equippable.Mace())
+mace = Item(
+    char="○", color=(160, 160, 160), name="Mace", equippable=equippable.Mace()
+    )
 
-long_sword = Item(char="/", color=(0, 191, 255), name="Long Sword", equippable=equippable.LongSword())
+long_sword = Item(
+    char="○", color=(160, 160, 160), name="Long Sword", equippable=equippable.LongSword()
+    )
 
-leather_armor = Item(char="[",
-    color=(139, 69, 19),
-    name="Leather Armor",
-    equippable=equippable.LeatherArmor(),
+leather_armor = Item(
+    char="○", color=(160, 160, 160), name="Leather Armor", equippable=equippable.LeatherArmor(),
 )
 
 chain_mail = Item(
-    char="↓", color=(139, 69, 19), name="Chain Mail", equippable=equippable.ChainMail()
+    char="○", color=(160, 160, 160), name="Chain Mail", equippable=equippable.ChainMail()
 )
 
 breast_plate = Item(
-    char="↓", color=(209, 205, 194), name="Breast Plate", equippable=equippable.BreastPlate()
+    char="○", color=(160, 160, 160), name="Breast Plate", equippable=equippable.BreastPlate()
 )
 
 plate_armor = Item(
-    char="↓", color=(148, 143, 129), name="Plate Armor", equippable=equippable.PlateArmor()
+    char="○", color=(160, 160, 160), name="Plate Armor", equippable=equippable.PlateArmor()
 )
 
 scale_armor = Item(
-    char="↓", color=(158, 5, 5), name="Scale Armor", equippable=equippable.ScaleArmor()
+    char="○", color=(160, 160, 160), name="Scale Armor", equippable=equippable.ScaleArmor()
 )

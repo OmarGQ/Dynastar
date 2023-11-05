@@ -52,8 +52,8 @@ floor = new_tile(
 wall = new_tile(
     walkable=False, 
     transparent=False, 
-    dark=(ord("#"), (155, 155, 155), (65, 55, 25)),
-    light=(ord("#"), (255, 255, 255), (50, 50, 0)),
+    dark=(ord("#"), (192, 192, 192), (65, 55, 25)),
+    light=(ord("#"), (250, 250, 250), (50, 50, 0)),
 )
 tree = new_tile(
     walkable=False, 
@@ -76,8 +76,8 @@ room_floor = new_tile(
 room_wall = new_tile(
     walkable=False, 
     transparent=False, 
-    dark=(ord("W"), (155, 155, 155), (65, 55, 25)),
-    light=(ord("W"), (255, 255, 255), (50, 50, 0)),
+    dark=(ord("◄"), (155, 155, 155), (65, 55, 25)),
+    light=(ord("◄"), (255, 255, 255), (50, 50, 0)),
 )
 down_stairs = new_tile(
     walkable=True,
