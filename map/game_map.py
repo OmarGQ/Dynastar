@@ -9,8 +9,8 @@ from __future__ import annotations
 from typing import Iterable, Iterator, Optional, TYPE_CHECKING, List, Tuple
 import numpy as np
 from tcod.console import Console
-from entity import Actor, Item
-import tile_types
+from entities.entity import Actor, Item
+import entities.tile_types as tile_types
 import random
 
 if TYPE_CHECKING:
@@ -71,7 +71,7 @@ class GameMap:
         return 0 <= x < self.width and 0 <= y < self.height
 
     def render(self, console: Console) -> None:
-        console.rgb[0:self.width, 0:self.height] = self.tiles["light"]
+        #console.rgb[0:self.width, 0:self.height] = self.tiles["light"]
         """
         Renders the map.
  
@@ -79,13 +79,11 @@ class GameMap:
         If it isn't, but it's in the "explored" array, then draw it with the "dark" colors.
         Otherwise, the default is "SHROUD".
         """
-        """
         console.tiles_rgb[0 : self.width, 0 : self.height] = np.select(
             condlist=[self.visible, self.explored],
             choicelist=[self.tiles["light"], self.tiles["dark"]],
             default=tile_types.SHROUD,
         )
-        """
         # Set entities
         entities_sorted_for_rendering = sorted(
             self.entities, key=lambda x: x.render_order.value
@@ -125,7 +123,7 @@ class GameWorld:
         self.room_max_size = 0
 
         self.current_floor = current_floor
-        self.complexity = 0.10
+        self.complexity = 0.09
 
     def generate_floor(self) -> None:
         from map.levelgen import generate_terrain
@@ -137,8 +135,8 @@ class GameWorld:
         extra = 1
         version = random.choice(generation)
         
-        if version == "Dungeon":
-            extra = 1.5
+        if version == "Dungeon" and self.current_floor > 4:
+            extra = 1.8
         elif version == "Cave":
             self.room_min_size = 9
             self.room_max_size = 13

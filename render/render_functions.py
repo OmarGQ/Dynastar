@@ -101,6 +101,8 @@ def render_ui(console, player, world) -> None:
     if number_of_items_in_inventory > 0:
         for i, item in enumerate(player.inventory.items):
             item_key = chr(ord("1") + i)
+            if item_key == ":":
+                item_key = "0"
             is_equipped = player.equipment.item_is_equipped(item)
             item_string = f"{item_key}) {item.name}"
 
@@ -109,15 +111,15 @@ def render_ui(console, player, world) -> None:
             console.print(x=92, y=y + i, string=item_string)
     else:
         console.print(x=92, y=y, string="(Empty)")
-    console.print(x=90, y=26, string="o-Controls--------------o", fg=colors.UI_border)
-    console.print(x=92, y=28, string="You can move with:\n ASWD, NumPad,\n or ArrowKeys")
-    console.print(x=92, y=32, string="'SPACE' or '5' Wait")
-    console.print(x=92, y=33, string="'I' use item")
-    console.print(x=92, y=34, string="'O' Drop item'")
-    console.print(x=92, y=35, string="'V' See full log")
-    console.print(x=92, y=36, string="'esc' Exit the game")
-    console.print(x=90, y=38, string="o-Information-----------o", fg=colors.UI_border)
-    console.print(x=90, y=69, string="o-----------------------o", fg=colors.UI_border)
+    console.print(x=90, y=27, string="o-Controls--------------o", fg=colors.UI_border)
+    console.print(x=92, y=29, string="You can move with:\n ASWD, NumPad,\n or ArrowKeys")
+    console.print(x=92, y=33, string="'SPACE' or '5' Wait")
+    console.print(x=92, y=34, string="'I' use item")
+    console.print(x=92, y=35, string="'O' Drop item'")
+    console.print(x=92, y=36, string="'V' See full log")
+    console.print(x=92, y=37, string="'esc' Exit the game")
+    console.print(x=90, y=39, string="o-Information-----------o", fg=colors.UI_border)
+    console.print(x=90, y=70, string="o-----------------------o", fg=colors.UI_border)
     
     
     console.print(x=0, y=61, string="o-GameLog--------------------------------------------------------------------------------o", fg=colors.UI_border)

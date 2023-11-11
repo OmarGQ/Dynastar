@@ -144,11 +144,9 @@ class EventHandler(BaseEventHandler):
 
     def handle_action(self, action: Optional[Action]) -> bool:
         """Handle actions returned from event methods.
-        Returns True if the action will advance a turn.
-        """
+        Returns True if the action will advance a turn."""
         if action is None:
             return False
-
         try:
             action.perform()
         except exceptions.Impossible as exc:
@@ -156,7 +154,6 @@ class EventHandler(BaseEventHandler):
             return False  # Skip enemy turn on exceptions.
 
         self.engine.handle_enemy_turns()
-
         self.engine.update_fov()
         return True
             
@@ -376,8 +373,6 @@ class SelectIndexHandler(AskUserEventHandler):
         """Called when an index is selected."""
         raise NotImplementedError()
 
-
-
 class AreaRangedAttackHandler(SelectIndexHandler):
     """Handles targeting an area within a given radius. Any entity within the area will be affected."""
 
@@ -395,7 +390,6 @@ class AreaRangedAttackHandler(SelectIndexHandler):
     def on_render(self, console: tcod.Console) -> None:
         """Highlight the tile under the cursor."""
         super().on_render(console)
-
         x, y = self.engine.mouse_location
 
         # Draw a rectangle around the targeted area, so the player can see the affected tiles.
@@ -452,6 +446,7 @@ class SingleRangedAttackHandler(SelectIndexHandler):
         return self.callback((x, y))
 
 class GameOverEventHandler(EventHandler):
+    
     def on_quit(self) -> None:
         """Handle exiting out of a finished game."""
         winsound.PlaySound(None, 0)
@@ -486,7 +481,6 @@ class HistoryViewer(EventHandler):
 
     def on_render(self, console: tcod.Console) -> None:
         super().on_render(console)  # Draw the main state as the background.
-
         log_console = tcod.Console(console.width - 6, console.height - 6)
 
         # Draw a frame with a custom banner title.

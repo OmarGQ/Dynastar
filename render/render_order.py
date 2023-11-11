@@ -7,7 +7,6 @@ Created on Tue May 23 14:23:42 2023
 
 from enum import auto, Enum
 
-
 class RenderOrder(Enum):
     CORPSE = auto()
     ITEM = auto()

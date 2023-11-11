@@ -15,7 +15,7 @@ import lzma
 import pickle
 import traceback
 import render.colors as colors
-import entity_factories
+import entities.entity_factories as entity_factories
 import input_handlers
 import winsound
 from engine import Engine
@@ -79,19 +79,12 @@ class MainMenu(input_handlers.BaseEventHandler):
 
         console.print(
             console.width // 2,
-            console.height // 2 - 4,
-            "DYNASTAR",
-            fg=colors.menu_title,
-            alignment=libtcodpy.CENTER,
-        )
-        console.print(
-            console.width // 2,
             console.height - 2,
             "By Kiddra",
             fg=colors.menu_title,
             alignment=libtcodpy.CENTER,
         )
-
+        
         menu_width = 24
         for i, text in enumerate(
             ["[N] Play a new game", "[C] Continue last game", "[Q] Quit"]
@@ -101,7 +94,6 @@ class MainMenu(input_handlers.BaseEventHandler):
                 console.height // 2 - 2 + i,
                 text.ljust(menu_width),
                 fg=colors.menu_text,
-                #bg=colors.black,
                 alignment=libtcodpy.CENTER,
                 bg_blend=libtcodpy.BKGND_ALPHA(64),
             )

@@ -8,7 +8,7 @@ Created on Sat May 20 19:53:48 2023
 from components.ai import HostileEnemy, SlowEnemy
 from components import consumable, equippable
 from components.fighter import Fighter
-from entity import Actor, Item
+from entities.entity import Actor, Item
 from components.inventory import Inventory
 from components.level import Level
 from components.equipment import Equipment
@@ -20,7 +20,7 @@ player = Actor(
     ai_cls=HostileEnemy,
     equipment=Equipment(),
     fighter=Fighter(hp=30, base_defense=1, base_power=2),
-    inventory=Inventory(capacity=9),
+    inventory=Inventory(capacity=10),
     level=Level(level_up_base=120)
 )
 
@@ -36,7 +36,7 @@ orc = Actor(
 )
  
 skeleton = Actor(
-    char="S",
+    char="→",
     color=(255, 255, 255),
     name="Skeleton",
     ai_cls=HostileEnemy,
@@ -47,8 +47,8 @@ skeleton = Actor(
 )
  
 zombie = Actor(
-    char="Z",
-    color=(211, 244, 212),
+    char="←",
+    color=(51, 255, 153),
     name="Zombie",
     ai_cls=SlowEnemy,
     equipment=Equipment(),
@@ -65,7 +65,7 @@ kobold = Actor(
     equipment=Equipment(),
     fighter=Fighter(hp=17, base_defense=3, base_power=5),
     inventory=Inventory(capacity=0),
-    level=Level(xp_given=60)
+    level=Level(xp_given=50)
 )
 
 troll = Actor(
@@ -76,7 +76,7 @@ troll = Actor(
     equipment=Equipment(),
     fighter=Fighter(hp=20, base_defense=2, base_power=7),
     inventory=Inventory(capacity=0),
-    level=Level(xp_given=100)
+    level=Level(xp_given=80)
 )
 
 super_orc = Actor(
@@ -91,7 +91,7 @@ super_orc = Actor(
 )
  
 super_skeleton = Actor(
-    char="S",
+    char="→",
     color=(204, 38, 226),
     name="Skeleton",
     ai_cls=HostileEnemy,
@@ -102,8 +102,8 @@ super_skeleton = Actor(
 )
  
 super_zombie = Actor(
-    char="Z",
-    color=(224, 58, 246),
+    char="←",
+    color=(0, 204, 102),
     name="Zombie",
     ai_cls=SlowEnemy,
     equipment=Equipment(),

@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 import random
 import tcod
-import tile_types
+import entities.tile_types as tile_types
 from typing import List, TYPE_CHECKING
 from map.game_map import GameMap
 from map.procgen import RectangularRoom, tunnel_between, place_entities_room, place_entities
@@ -131,14 +131,13 @@ def locate_rooms(dungeon: GameMap,
 
 def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles, flag = False, door = None, start = None):
     """Clear the path to get out and into the rooms"""
-    midX = int(dungeon.width/2)
-    midY = int(dungeon.height/2)
+    endpoint = [int(dungeon.width/2), int(dungeon.height/2)]
     clear = 0
     distance = 0
     room = rooms.pop(0)
     if door == None and start == None:
         door, start, d2, s2 = Select_direction(dungeon, room, noise)
-    for x, y in tunnel_between(start, [midX, midY]):
+    for x, y in tunnel_between(start, endpoint):
         if clear == tiles[2]:
             break
         if (noise[x, y] > tiles[1] and noise[x, y] < 1.1):
@@ -154,7 +153,12 @@ def path_generation(dungeon: GameMap, rooms: np.array, noise, tiles, flag = Fals
         clear += 1
         distance += 1
     noise[door] = tiles[0]
-    if (distance < 15 or random.random() < 0.4) and flag ==False:
+    if (distance < 15 or random.random() < 0.5) and flag ==False:
+        if d2 == None:
+            if len(rooms) != 0:
+                d2, s2= Select_direction_alt(dungeon, room, rooms[0])
+            else:
+                return noise
         noise = path_generation(dungeon, [room], noise, tiles, True, d2, s2)
     if len(rooms) == 0:
         return noise
@@ -165,87 +169,94 @@ def Select_direction(dungeon: GameMap, room, noise):
     thirdX = int(dungeon.width/3)
     thirdY = int(dungeon.height/3)
     center = room.center
+    Locations = {
+        #starting point
+        "UP_S": (center[0], room.y1-1),
+        "DOWN_S": (center[0], room.y2),
+        "LEFT_S": (room.x1-1, center[1]),
+        "RIGHT_S": (room.x2, center[1]),
+        #door location
+        "UP_D": (center[0], room.y1),
+        "DOWN_D": (center[0], room.y2-1),
+        "LEFT_D": (room.x1, center[1]),
+        "RIGHT_D": (room.x2-1, center[1]),
+    }
+    
     if center[1] < thirdY:
         if center[0] < thirdX: #Top left
             if noise[center[0], room.y2+1] < 0.4:
-                door = (center[0], room.y2-1) #bottom
-                start = (center[0], room.y2) #bottom
-                door2 = (room.x2-1, center[1]) #right
-                start2 = (room.x2, center[1]) #right
+                return Locations["DOWN_D"], Locations["DOWN_S"], Locations["RIGHT_D"], Locations["RIGHT_S"]
             else:
-                door = (room.x2-1, center[1]) #right
-                start = (room.x2, center[1]) #right
-                door2 = (center[0], room.y2-1) #bottom
-                start2 = (center[0], room.y2) #bottom
+                return Locations["RIGHT_D"], Locations["RIGHT_S"], Locations["DOWN_D"], Locations["DOWN_S"]
         elif center[0] > thirdX*2: #Top right
             if noise[center[0], room.y2+1] < 0.4:
-                door = (center[0], room.y2-1) #bottom
-                start = (center[0], room.y2)
-                door2 = (room.x1, center[1]) #left
-                start2 = (room.x1-1, center[1]) #left
+                return Locations["DOWN_D"], Locations["DOWN_S"], Locations["LEFT_D"], Locations["LEFT_S"]
             else:
-                door = (room.x1, center[1]) #left
-                start = (room.x1-1, center[1]) #left
-                door2 = (center[0], room.y2-1) #bottom
-                start2 = (center[0], room.y2)
-        else:
-            door = (center[0], room.y2-1) #bottom
-            start = (center[0], room.y2) #bottom
-            door2 = (center[0], room.y2-1) #bottom
-            start2 = (center[0], room.y2) #bottom
+                return Locations["LEFT_D"], Locations["LEFT_S"], Locations["DOWN_D"], Locations["DOWN_S"]
+        else: #Top center
+            return Locations["DOWN_D"], Locations["DOWN_S"], None, None
     elif center[1] > thirdY*2:
         if center[0] < thirdX:  #Bottom left
             if noise[center[0], room.y1-1] < 0.4:
-                door = (center[0], room.y1) #top
-                start = (center[0], room.y1-1) #top
-                door2 = (room.x2-1, center[1]) #right
-                start2 = (room.x2, center[1]) #right
+                return Locations["UP_D"], Locations["UP_S"], Locations["RIGHT_D"], Locations["RIGHT_S"]
             else:
-                door = (room.x2-1, center[1]) #right
-                start = (room.x2, center[1]) #right
-                door2 = (center[0], room.y1) #top
-                start2 = (center[0], room.y1-1) #top
+                return Locations["RIGHT_D"], Locations["RIGHT_S"], Locations["UP_D"], Locations["UP_S"]
         elif center[0] > thirdX*2: #Bottom right
             if noise[center[0], room.y1-1] < 0.4:
-                door = (center[0], room.y1) #top
-                start = (center[0], room.y1-1) #top
-                door2 = (room.x1, center[1]) #left
-                start2 = (room.x1-1, center[1]) #left
+                return Locations["UP_D"], Locations["UP_S"], Locations["LEFT_D"], Locations["LEFT_S"]
             else:
-                door = (room.x1, center[1]) #left
-                start = (room.x1-1, center[1]) #left
-                door2 = (center[0], room.y1) #top
-                start2 = (center[0], room.y1-1) #top
-        else:
-            door = (center[0], room.y1) #top
-            start = (center[0], room.y1-1) #top
-            door2 = (center[0], room.y1) #top
-            start2 = (center[0], room.y1-1) #top
+                return Locations["LEFT_D"], Locations["LEFT_S"], Locations["UP_D"], Locations["UP_S"]
+        else: #Bottom center
+            return Locations["UP_D"], Locations["UP_S"], None, None
     else:
-        if center[0] < thirdX:  #Bottom left
-            door = (room.x2-1, center[1]) #right
-            start = (room.x2, center[1]) #right
-            door2 = (room.x2-1, center[1]) #right
-            start2 = (room.x2, center[1]) #right
-
-        elif center[0] > thirdX*2: #Bottom right
-            door = (room.x1, center[1]) #left
-            start = (room.x1-1, center[1]) #left
-            door2 = (room.x1, center[1]) #left
-            start2 = (room.x1-1, center[1]) #left
-        else:
+        if center[0] < thirdX:  #Middle left
+            return Locations["RIGHT_D"], Locations["RIGHT_S"], None, None
+        elif center[0] > thirdX*2: #Middle right
+            return Locations["LEFT_D"], Locations["LEFT_S"], None, None
+        else: #Center
             if noise[center[0], room.y2+1] < 0.4:
-                door = (center[0], room.y2-1) #bottom
-                start = (center[0], room.y2) #bottom
-                door2 = (room.x2-1, center[1]) #right
-                start2 = (room.x2, center[1]) #right
+                return Locations["DOWN_D"], Locations["DOWN_S"], None, None
             else:
-                door = (center[0], room.y1) #top
-                start = (center[0], room.y1-1) #top
-                door2 = (room.x1, center[1]) #left
-                start2 = (room.x1-1, center[1]) #left
-    return door, start, door2, start2
+                return Locations["UP_D"], Locations["UP_S"], None, None
                 
+def Select_direction_alt(dungeon: GameMap, room, roomE):
+    centerS = room.center
+    centerE = roomE.center
+    Locations = {
+        #starting point
+        "UP_S": (centerS[0], room.y1-1),
+        "DOWN_S": (centerS[0], room.y2),
+        "LEFT_S": (room.x1-1, centerS[1]),
+        "RIGHT_S": (room.x2, centerS[1]),
+        #door location
+        "UP_D": (centerS[0], room.y1),
+        "DOWN_D": (centerS[0], room.y2-1),
+        "LEFT_D": (room.x1, centerS[1]),
+        "RIGHT_D": (room.x2-1, centerS[1]),
+    }
+    if centerS[1] < centerE[1]:
+        if centerS[0] < centerE[0]:
+            if random.random() > 0.5:
+                return Locations["DOWN_D"], Locations["DOWN_S"]
+            else:
+                return Locations["RIGHT_D"], Locations["RIGHT_S"]
+        else:
+            if random.random() > 0.5:
+                return Locations["DOWN_D"], Locations["DOWN_S"]
+            else:
+                return Locations["LEFT_D"], Locations["LEFT_S"]
+    else:
+        if centerS[0] < centerE[0]:
+            if random.random() > 0.5:
+                return Locations["UP_D"], Locations["UP_S"]
+            else:
+                return Locations["RIGHT_D"], Locations["RIGHT_S"]
+        else:
+            if random.random() > 0.5:
+                return Locations["UP_D"], Locations["UP_S"]
+            else:
+                return Locations["LEFT_D"], Locations["LEFT_S"]
+            
 def Set_tiles(
     dungeon: GameMap,
     map_width: int,
@@ -295,8 +306,7 @@ def CA(
     		choice = random.uniform(0, 1)
     		sample[i][j] = 0 if choice < fill_prob else 1
 
-    """run for 6 generations"""
-    generations = 6
+    generations = 6 #Run for 6 generations
     for generation in range(generations):
     	for i in range(shape[0]):
     		for j in range(shape[1]): # Count walls around the cell
@@ -304,7 +314,7 @@ def CA(
     			wallcount_1away = len(np.where(submap.flatten() == 0)[0])
     			submap = sample[max(i-2, 0):min(i+3, sample.shape[0]),max(j-2, 0):min(j+3, sample.shape[1])]
     			wallcount_2away = len(np.where(submap.flatten() == 0)[0])
-    			"""for first five generations build a scaffolding of walls"""
+    			"""For first five generations build a scaffolding of walls"""
     			if generation < 5:
     				if wallcount_1away >= 5 or wallcount_2away <= 7:
     					sample[i][j] = 0

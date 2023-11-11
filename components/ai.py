@@ -6,10 +6,8 @@ Created on Tue May 23 12:49:29 2023
 """
 
 from __future__ import annotations
-
 from typing import List, Optional, Tuple, TYPE_CHECKING
 from actions import Action, BumpAction, MeleeAction, MovementAction, WaitAction
-
 import random
 import numpy as np  # type: ignore
 import tcod
@@ -35,11 +33,9 @@ class BaseAI(Action):
         raise NotImplementedError()
 
     def get_path_to(self, dest_x: int, dest_y: int) -> List[Tuple[int, int]]:
-        """
-        Compute and return a path to the target position.
+        """Compute and return a path to the target position.
         If there is no valid path then returns an empty list.
         """
-        # Copy the walkable array.
         cost = np.array(self.entity.gamemap.tiles["walkable"], dtype=np.int8)
 
         for entity in self.entity.gamemap.entities:
@@ -116,18 +112,7 @@ class ConfusedEnemy(BaseAI):
             self.entity.ai = self.previous_ai
         else:
             # Pick a random direction
-            direction_x, direction_y = random.choice(
-                [
-                    (-1, -1),  # Northwest
-                    (0, -1),  # North
-                    (1, -1),  # Northeast
-                    (-1, 0),  # West
-                    (1, 0),  # East
-                    (-1, 1),  # Southwest
-                    (0, 1),  # South
-                    (1, 1),  # Southeast
-                ]
-            )
+            direction_x, direction_y = random.choice(Movements)
             self.turns_remaining -= 1
             # The actor will either try to move or attack in the chosen random direction.
             # Its possible the actor will just bump into the wall, wasting a turn.

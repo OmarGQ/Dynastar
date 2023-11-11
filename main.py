@@ -4,6 +4,7 @@ Created on Tue Feb 21 15:15:47 2023
 
 @author: kiddra
 """
+
 import tcod
 import render.colors as colors
 import traceback
@@ -40,8 +41,7 @@ def main() -> None:
                 root_console.clear()
                 handler.on_render(console=root_console)
                 context.present(root_console)
-                #Full screen
-                #
+                """Full screen"""
                 context.sdl_window.fullscreen = tcod.sdl.video.WindowFlags.FULLSCREEN_DESKTOP
                 
                 try:
