@@ -1,4 +1,5 @@
 # Dynastar
+![Image Alt Text](data:images/Dynastar.png;base64,Base64-encoded-image-data)
 Generating new levels automatically might appeal to some as a lazy way to create 
 endless content for a game. But when correctly applied, it can present an experience that will 
 still feel fresh after hours of the game. This concept has been slowly introduced into video game 
