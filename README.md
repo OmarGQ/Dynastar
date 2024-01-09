@@ -1,5 +1,4 @@
 # Dynastar
-![Dynastar](/images/Dynastar.png
 ![Dynastar](/images/Dynastar.png "Dynastar"))
 Generating new levels automatically might appeal to some as a lazy way to create 
 endless content for a game. But when correctly applied, it can present an experience that will 
